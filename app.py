@@ -8,6 +8,12 @@ This file creates your application.
 
 import os
 from flask import Flask, render_template, request, redirect, url_for
+import logging
+from slackclient import SlackClient
+
+token = "xoxp-48970123489-48964881879-50048816096-fd79da89e6"      # found at https://api.slack.com/web#authentication
+sc = SlackClient(token)
+
 
 app = Flask(__name__)
 
@@ -20,9 +26,24 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configur
 
 @app.route('/')
 def home():
+    test= sc.api_call("api.test")
+    channels= sc.api_call("channels.list", token=token)
+    print channels
+    logging.debug(channels)
+    # print sc.api_call(
+    #     "chat.postMessage", channel="#general", text="Hello from Python! :tada:",
+    #     username='pybot', icon_emoji=':robot_face:'
+    # )
     """Render website's home page."""
-    return render_template('home.html')
+    return render_template('home.html', test=test, channels=channels,msglist='')
 
+@app.route('/switchmsg', methods=['GET', 'POST'])
+def foo(x=None, y=None):
+    # do something to send email
+    id=request.form['id']
+    channels= sc.api_call("channels.list", token=token)
+    msglist= sc.api_call("channels.history",token=token, channel=id)
+    return render_template('home.html', channels=channels,msglist=msglist)
 
 @app.route('/about/')
 def about():

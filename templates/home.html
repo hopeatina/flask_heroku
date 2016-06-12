@@ -1,9 +1,34 @@
 {% extends "base.html" %}
 
-
 {% block js %}
+
+
 {% endblock %}
 
 
 {% block main %}
+    Channels list
+
+    <ul>
+    {% for entry in channels.channels %}
+            <form action="/switchmsg" method="post">
+        <input name="id" type="hidden" value="{{ entry.id }}">
+       <button type="submit"  value="{{ entry.id }}"> {{ entry.id }}
+        {{ entry.name }}
+        {{ entry.num_members }}</button>
+            </form>
+    {% endfor %}
+    </ul>
+
+    Messages
+    <ul>
+    {% for message in msglist.messages %}
+
+    <li>{{ message.user }}, {{ message.text }}, {{ message.type }}</li>
+    {% endfor %}
+    </ul>
+
+    Visualization
+
+
 {% endblock %}
