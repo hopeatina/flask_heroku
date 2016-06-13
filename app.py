@@ -10,6 +10,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 import logging
 from slackclient import SlackClient
+import unicodedata, re
 
 token = "xoxp-48970123489-48964881879-50048816096-fd79da89e6"      # found at https://api.slack.com/web#authentication
 sc = SlackClient(token)
@@ -43,13 +44,43 @@ def foo(x=None, y=None):
     id=request.form['id']
     channels= sc.api_call("channels.list", token=token)
     msglist= sc.api_call("channels.history",token=token, channel=id)
-    return render_template('home.html', channels=channels,msglist=msglist)
+    foundlinks = []
+    for msg in msglist['messages']:
+        msgencode= unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore')
+        userencode= unicodedata.normalize('NFKD',  msg['user']).encode('ascii','ignore')
+        foundlinks.append(re.findall("<(.*?)>",msgencode))
+        createnodes(re.findall("<(.*?)>",msgencode),msg,userencode)
+    return render_template('home.html', channels=channels,msglist=msglist, foundlinks=foundlinks)
+
+def createnodes(entitieslist,msg,originuser):
+    for entity in entitieslist:
+        if entity[:2] == "#C":
+            print "Channel: " + entity
+            createrelationship(originuser,entity,"channel",msg)
+        elif entity[:2] == "@U":
+            print "User: " + entity
+            createrelationship(originuser,entity,"user",msg)
+        elif entity[:1] == "!":
+            specials()
+        else:
+            print "Link: " + entity
+            createrelationship(originuser,entity,"link",msg)
+
+    if entitieslist == []:
+        createrelationship(originuser, "", "text", msg)
+
+def createrelationship(originuser,object,nodetype,msg):
+    # type: (str, str, str, str) -> none
+
+    return
+
+def specials():
+    return
 
 @app.route('/about/')
 def about():
     """Render the website's about page."""
     return render_template('about.html')
-
 
 ###
 # The functions below should be applicable to all Flask apps.
