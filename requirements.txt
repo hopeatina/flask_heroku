@@ -16,3 +16,5 @@ mock
 gunicorn
 gevent
 slackclient
+virtualenv
+neo4jrestclient

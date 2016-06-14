@@ -11,10 +11,21 @@ from flask import Flask, render_template, request, redirect, url_for
 import logging
 from slackclient import SlackClient
 import unicodedata, re
+from neo4jrestclient.client import GraphDatabase
 
-token = "xoxp-48970123489-48964881879-50048816096-fd79da89e6"      # found at https://api.slack.com/web#authentication
+
+gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+users = gdb.labels.create("User")
+channels = gdb.labels.create("Channel")
+links = gdb.labels.create("Link")
+messages = gdb.labels.create("Message")
+
+# token = os.environ.get('SLACKTOKEN')
+token = 'xoxp-48970123489-48964881879-50048816096-fd79da89e6'
+print token
+print os.environ.get("GRAPHENEDB_URL")
+# found at https://api.slack.com/web#authentication
 sc = SlackClient(token)
-
 
 app = Flask(__name__)
 
@@ -71,6 +82,29 @@ def createnodes(entitieslist,msg,originuser):
 
 def createrelationship(originuser,object,nodetype,msg):
     # type: (str, str, str, str) -> none
+    if nodetype== 'channel':
+        ch = channels.create(id=object)
+        msg = messages.create(text=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore'))
+        user = users.create(id=originuser)
+        msg.relationships.create("By",user)
+        msg.relationships.create("Includes",ch)
+        user.relationships.create("Mentions",ch,count=1)
+    elif nodetype == 'user':
+        entuser = users.create(id=object)
+        msg = messages.create(text=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore'))
+        user = users.create(id=originuser)
+        msg.relationships.create("By", user)
+        msg.relationships.create("Includes", entuser)
+        user.relationships.create("Mentions", entuser, count=1)
+    elif nodetype == 'link':
+        lnk = links.create(id=object)
+        msg = messages.create(text=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore'))
+        user = users.create(id=originuser)
+        msg.relationships.create("By", user)
+        msg.relationships.create("Includes", lnk)
+        user.relationships.create("Mentions", lnk, count=1)
+    else:
+
 
     return
 
