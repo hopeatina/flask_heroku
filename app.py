@@ -20,6 +20,12 @@ channels = gdb.labels.create("Channel")
 links = gdb.labels.create("Link")
 messages = gdb.labels.create("Message")
 
+useridx = gdb.nodes.indexes.create("users")
+channelidx = gdb.nodes.indexes.create("channels")
+linkidx = gdb.nodes.indexes.create("links")
+messageidx = gdb.nodes.indexes.create("messages")
+
+
 # token = os.environ.get('SLACKTOKEN')
 token = 'xoxp-48970123489-48964881879-50048816096-fd79da89e6'
 print token
@@ -80,32 +86,78 @@ def createnodes(entitieslist,msg,originuser):
     if entitieslist == []:
         createrelationship(originuser, "", "text", msg)
 
+def createEntity(type, object, idx, idxtext):
+    # creates an entity in the database after checking if it exists
+    nodes = idx[idxtext][object]
+    if len(nodes):
+        objectnode = nodes[0]
+    else:
+        objectnode = type.create(value=object)
+
+    return objectnode
+
 def createrelationship(originuser,object,nodetype,msg):
     # type: (str, str, str, str) -> none
+    msgtext=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore')
+    idname= object.split('|',1)
+    print idname
+
     if nodetype== 'channel':
-        ch = channels.create(id=object)
-        msg = messages.create(text=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore'))
-        user = users.create(id=originuser)
+        # if len(nodes):
+        #     rel = nodes[0].relationships.all(types=[tag_node["tag"]])[0]
+        # rel["count"] += 1
+        # else:
+        ch = createEntity(channels,object,channelidx,"channels")
+        # ch = channels.create(key='name', value=object, name=object)
+        # msg = messages.create(key='text',value=msgtext,text=msgtext)
+        msg = createEntity(messages,msgtext,messageidx,"messages")
+        # user = users.create(key='slackid', value='originuser', slackid=originuser)
+        user = createEntity(users,originuser,useridx,"users")
         msg.relationships.create("By",user)
         msg.relationships.create("Includes",ch)
         user.relationships.create("Mentions",ch,count=1)
+        channelidx["channel"][ch["value"]] = ch
+        useridx["users"][user["value"]] = user
+        messageidx["messages"][msg["value"]] = msg
     elif nodetype == 'user':
-        entuser = users.create(id=object)
-        msg = messages.create(text=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore'))
-        user = users.create(id=originuser)
+        # if len(idname) > 1:
+        #     use = idname[1]
+        # else:
+        use = idname[0].replace('@', '')
+
+        # entuser = users.create(key='slackid',value=idname[0],slackid=idname[0],name=use)
+        entuser = createEntity(users,use,useridx,"users")
+        # msg = messages.create(key='text',value=msgtext,text=msgtext)
+        msg = createEntity(messages,msgtext,messageidx,"messages")
+        # user = users.create(key='slackid', value='originuser', slackid=originuser)
+        user = createEntity(users,originuser,useridx,"users")
         msg.relationships.create("By", user)
         msg.relationships.create("Includes", entuser)
         user.relationships.create("Mentions", entuser, count=1)
+        useridx["users"][user["value"]] = user
+        useridx["users"][entuser["value"]] = entuser
+        messageidx["messages"][msg["value"]] = msg
     elif nodetype == 'link':
-        lnk = links.create(id=object)
-        msg = messages.create(text=unicodedata.normalize('NFKD', msg['text']).encode('ascii','ignore'))
-        user = users.create(id=originuser)
+        # lnk = links.create(key='linkid',value=object,linkid=object)
+        lnk = createEntity(links,object,linkidx,"links")
+        # msg = messages.create(key='text',value=msgtext,text=msgtext)
+        msg = createEntity(messages,msgtext,messageidx,"messages")
+        # user = users.create(key='slackid', value='originuser', slackid=originuser)
+        user = createEntity(users,originuser,useridx,"users")
         msg.relationships.create("By", user)
         msg.relationships.create("Includes", lnk)
         user.relationships.create("Mentions", lnk, count=1)
+        linkidx["links"][user["value"]] = lnk
+        useridx["users"][user["value"]] = user
+        messageidx["messages"][msg["value"]] = msg
     else:
-
-
+        # msg = messages.create(key='text',value=msgtext,text=msgtext)
+        msg = createEntity(messages,msgtext,messageidx,"messages")
+        # user = users.create(key='slackid', value='originuser', slackid=originuser)
+        user = createEntity(users,originuser,useridx,"users")
+        msg.relationships.create("By", user)
+        useridx["users"][user["value"]] = user
+        messageidx["messages"][msg["value"]] = msg
     return
 
 def specials():
