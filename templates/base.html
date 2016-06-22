@@ -1,71 +1,161 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+        <meta charset="utf-8">
 
-  <title>{% block title %}yoursite.com{% endblock %}</title>
+    <title>{% block title %}percey.com{% endblock %}</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <link rel="shortcut icon" href="/static/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    {#    <!-- Compiled and minified CSS -->#}
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">#}
+    {##}
+    {#    <!-- Compiled and minified JavaScript -->#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>#}
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script src="../static/app/homecontroller.js"></script>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="../static/css/appmain.css">
 
-  <!-- HTML5 shim, for IE 6-8 support of HTML elements -->
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+    <link rel="stylesheet/less" href="/static/css/main.less">
+    <link rel="stylesheet" href="../static/js/0.4.1/styles/vendor.css">
+    <link rel="stylesheet" href="../static/js/0.4.1/alchemy.min.css">
+    <link rel="stylesheet" href="../static/js/0.4.1/alchemy-white.css">
+    {% block css %}{% endblock %}
 
-  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
-  <link rel="stylesheet/less" href="/static/css/main.less">
-  {% block css %}{% endblock %}
-
-  <!-- Rather use `less.js` to dynamically compile your `stylesheet/less` files? -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js"></script>
-  <script>window.less || document.write('<script src="/static/js/less.js">\x3C/script>')</script>
-
-  <!-- Need Modernizr? Uncomment the following script. -->
-  <!-- <script src="/static/js/modernizr.js"></script> -->
+    <!-- Rather use `less.js` to dynamically compile your `stylesheet/less` files? -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js"></script>
+    <script> window.less || document.write('<script src="/static/js/less.js">\x3C/script>')</script>
 
 </head>
 
-<body>
+<body ng-app="myApp">
 
-  <header>
-    {% include "header.html" %}
-  </header>
+{#<header>#}
+{#    {% include "header.html" %}#}
+{#</header>#}
+<div ng-controller="MyCtrl" class="container-fluid">
 
-  <div id="main" role="main">
-    {% block main %}{% endblock %}
-  </div>
+    <div class="col-md-3" id="left">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <select ng-init="selectedChannel = channels[0]"
+                        ng-model='selectedChannel' required
+                        ng-options='option.value as option.name for option in channels'>
+                    <option value="" selected="selected">All channels</option>
+                </select>
+            </div>
+        </div>
 
-  <footer>
-    {% include "footer.html" %}
-  </footer>
-
-
-  <!-- JavaScript at the bottom for fast page loading -->
-
-  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="/static/js/libs/jquery.js">\x3C/script>')</script>
-
-
-  <!-- Additional JavaScript libraries and plugins... -->
-  {% block js %}{% endblock %}
-
-
-  <!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
-  <script>
-    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-    s.parentNode.insertBefore(g,s)}(document,'script'));
-  </script>
+        <div class="panel panel-default" id="category">
+            <div class="panel-heading"><select ng-init="selectedChannel = typeOptions[0]" ng-model='boom' required
+                                               ng-options='option.value as option.name for option in typeOptions'>
+                <option value="">Explore By User</option>
+            </select></div>
+            <div class="list-group internal-list">
+                <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)" class="list-group-item">
+                    <h4 class="list-group-item-heading">{{ entity.name | angular }}</h4>
+                    {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
+                </a>
+            </div>
+        </div>
 
 
-  <!-- Prompt IE < 8 users to install Chrome Frame.  -->
-  <!--[if lt IE 8 ]>
+    </div>
+    <div class="col-md-6" id="middle">
+        <div class="panel panel-primary within-full" style="background-color:rgba(0, 0, 0, 0.5);">
+            <div class="panel-heading ">
+                <div class="center-heading">
+                    <h3 class="center-title panel-title "
+                        style="margin-top: 10px; float: left;">
+                        Explore {{ selectedCatItem | angular }}'s {{ explorecurrent | angular }}</h3>
+                    <button ng-click="switchExplore()" type="button"
+                            class="btn btn-success center-button">{{ exploretext | angular }}</button>
+                </div>
+            </div>
+            <div ng-show="explorebool" class="list-group internal-list-full">
+                    {% block main %}{% endblock %}
+                    {{ responseobject | angular }}
+            </div>
+            <div ng-hide="explorebool" class="list-group internal-list-full">
+                Graph View
+                {{ returneddata | angular }}
+                <div class='alchemy' id='alchemy'></div>
+
+
+                <script src="../static/js/0.4.1/scripts/vendor.js"></script>
+                <script src="../static/js/0.4.1/alchemy.min.js"></script>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3" id="right">
+        <div class="panel panel-default within-full" style="background-color:rgba(0, 0, 0, 0.5);">
+            {#            <div class="panel-body within-full ">#}
+            {##}
+            {#
+{#<div class="btn-group-vertical" role="group" aria-label="...">#}
+            {#                    <button type="button" class="btn btn-success">Filter</button>#}
+            {#                    <button type="button" class="btn btn-success">Sort</button>#}
+            {#                    <button type="button" class="btn btn-success">Magic</button>#}
+            {#                </div>#}
+            {##}
+            {#            </div>#}
+            <div class="panel-heading">Buttons for filtering </div>
+            <div class="vertical-center within-full">
+                <div class="buttontogether">
+                    <div class="row buttonrow">
+                        <button type="button" class="btn btn-success">Filter</button>
+                    </div>
+                    <div class="row buttonrow">
+                        <button type="button" class="btn btn-success">Sort</button>
+                    </div>
+                    <div class="row buttonrow">
+                        <button type="button" class="btn btn-success">Magic</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{#<footer>#}
+{#    {% include "footer.html" %}#}
+{#</footer>#}
+
+
+<!-- JavaScript at the bottom for fast page loading -->
+
+<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/static/js/libs/jquery.js">\x3C/script>')</script>
+
+
+<!-- Additional JavaScript libraries and plugins... -->
+{% block js %}{% endblock %}
+
+
+<!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
+<script>
+    var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+    (function (d, t) {
+        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        g.async = 1;
+        g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g, s)
+    }(document, 'script'));
+</script>
+
+
+<!-- Prompt IE < 8 users to install Chrome Frame.  -->
+<!--[if lt IE 8 ]>
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->

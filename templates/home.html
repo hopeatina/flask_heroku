@@ -1,35 +1,40 @@
+
 {% extends "base.html" %}
 
 {% block js %}
-
-
 {% endblock %}
 
+<p>
+        Search:
+        <input ng-model="tester">
+    </p>
+    <p>1 + 2 = {{ tester | angular }}</p>
 
 {% block main %}
-    Channels list
+<div>    Channels list
 
     <ul>
-    {% for entry in channels.channels %}
+        {% for entry in channels.channels %}
             <form action="/switchmsg" method="post">
-        <input name="id" type="hidden" value="{{ entry.id }}">
-       <button type="submit"  value="{{ entry.id }}"> {{ entry.id }}
-        {{ entry.name }}
-        {{ entry.num_members }}</button>
+                <input name="id" type="hidden" value="{{ entry.id }}">
+                <button class="btn btn-success" type="submit" value="{{ entry.id }}"> {{ entry.id }}
+                    {{ entry.name }}
+                    {{ entry.num_members }}</button>
             </form>
-    {% endfor %}
+        {% endfor %}
     </ul>
 
     Messages
     <ul>
-    {% for message in msglist.messages %}
+        {% for message in msglist.messages %}
 
-    <li>{{ message.user }}, {{ message.text }}, {{ message.type }}</li>
-    {% endfor %}
+            <li>{{ message.user }}, {{ message.text }}, {{ message.type }}</li>
+        {% endfor %}
     </ul>
 
     Visualization
     {{ foundlinks }}
+</div>
 
 
 {% endblock %}
