@@ -14,48 +14,25 @@ myApp.controller('MyCtrl', MyCtrl)
     .factory("jsService", function () {
         // here goes the code of your js (d3 in my case)
         //now return the object of the service
-        
+
         return d3;
     });
 
 function MyCtrl($scope, $http, $window) {
 
 
-    var some_data =
-                    {
-                        "nodes": [
-                            {
-                                "id": 1
-                            },
-                            {
-                                "id": 2
-                            },
-                            {
-                                "id": 3
-                            }
-                        ],
-                        "edges": [
-                            {
-                                "source": 1,
-                                "target": 2
-                            },
-                            {
-                                "source": 1,
-                                "target": 3
-                            },{
-                                "source": 3,
-                                "target": 2
-                            }
+    $scope.some_data =
+    {
+        "nodes": [ ],
+        "edges": [ ]
+    };
+    $scope.config = {
+        dataSource: $scope.some_data
+    };
 
-                        ]
-                    };
-                    var config = {
-                        dataSource: some_data
-                    };
+    $scope.alchemy = new $window.Alchemy($scope.config);
 
-    var alchemy = new $window.Alchemy(config);
-
-    $scope.explorebool = true;
+    $scope.explorebool = false;
     $scope.exploretext = "View Graph";
     $scope.explorecurrent = "Messages";
     $scope.currentEntities = [
@@ -74,6 +51,7 @@ function MyCtrl($scope, $http, $window) {
     ];
     $scope.form = {type: $scope.typeOptions[0].value};
     $scope.responseobject = "RESPONSE OBJECT GOES HERE";
+    $scope.graphstyle = "background-color:rgba(0, 0, 0, 0.5) !important;";
 
     $scope.switchExplore = function () {
         $scope.explorebool = !$scope.explorebool;
@@ -132,8 +110,25 @@ function MyCtrl($scope, $http, $window) {
             headers: {'Content-Type': 'application/json'},
             data: JSON.stringify(entityid)
         }).success(function (data) {
-            console.log(data, "Got graph data");
+
             $scope.returneddata = data;
+            $scope.some_data = {
+                "nodes": data.nodes,
+                "edges": []
+            };
+            console.log($scope.some_data, "Got graph data");
+            $scope.config = {
+                dataSource: $scope.some_data,
+                forceLocked: false,
+                zoomControls: true,
+                initialScale: .25,
+                initialTranslate: [250,200]
+                // graphHeight: function() {return $window.innerHeight/2},
+                // graphWidth: function() {return $window.innerWidth/4}
+            };
+            $scope.alchemy.Remove;
+            $scope.alchemy = new $window.Alchemy($scope.config);
+
         }, function errorCallback(response) {
             // called asynchronously if an error occurs
             // or server returns response with an error status.

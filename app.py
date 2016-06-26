@@ -10,10 +10,13 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import logging
 from slackclient import SlackClient
-import unicodedata, re
+import unicodedata
 from neo4jrestclient.client import GraphDatabase
-from neo4jrestclient import constants
+from neo4jrestclient import client
 from flask.ext.triangle import Triangle
+import re
+from fromdb import from_api
+
 
 gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 users = gdb.labels.create("User")
@@ -36,7 +39,7 @@ app = Flask(__name__)
 Triangle(app)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
-
+app.register_blueprint(from_api)
 
 ###
 # Routing for your application.
@@ -73,15 +76,19 @@ def getcategories():
     return jsonify(users)
 
 
-@app.route('/api/getexploredata', methods=['GET', 'POST'])
-def getexploredata():
-    query = "start n=node(*) MATCH (nodes)--> (user:User {value:" + request.data + "}) RETURN user, nodes"
-    result = gdb.query(q=query, returns=constants.RAW)
-    print("Got explorer data", request.data, result)
-
-
-    # return jsonify({"list": "channels"})
-    return result
+# @app.route('/api/getexploredata', methods=['GET', 'POST'])
+# def getexploredata():
+#     query = "start n=node(*) MATCH (nodes)--> (user:User {value:" + request.data + "}) RETURN user, nodes"
+#     result = gdb.query(q=query,data_contents=True)
+#     print("Got explorer data", request.data, result)
+#     print("DIR", dir(result))
+#     # print result.graph
+#     # graph = result.graph
+#
+#
+#
+#     # return jsonify({"list": "channels"})
+#     return result
 
 @app.route('/api/getteaminfo', methods=['GET', 'POST'])
 def getteaminfo():
@@ -126,6 +133,8 @@ def createnodes(entitieslist, msg, originuser):
 def createEntity(type, object, idx, idxtext):
     # creates an entity in the database after checking if it exists
     nodes = idx[idxtext][object]
+    print len(nodes) + "" + idxtext
+
     if len(nodes):
         objectnode = nodes[0]
     else:
@@ -171,7 +180,8 @@ def createrelationship(originuser, object, nodetype, msg):
         user = createEntity(users, originuser, useridx, "users")
         msg.relationships.create("By", user)
         msg.relationships.create("Includes", entuser)
-        user.relationships.create("Mentions", entuser, count=1)
+        if entuser != user:
+            user.relationships.create("Mentions", entuser)
         useridx["users"][user["value"]] = user
         useridx["users"][entuser["value"]] = entuser
         messageidx["messages"][msg["value"]] = msg
