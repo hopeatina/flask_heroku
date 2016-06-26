@@ -13,8 +13,9 @@ mock
 # ----------------------
 # Production Server
 # ----------------------
-gunicorn
+gunicorn>=19.0.0
 gevent
 slackclient
 virtualenv
 neo4jrestclient
+
