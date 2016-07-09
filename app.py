@@ -130,15 +130,36 @@ def createnodes(entitieslist, msg, originuser):
         createrelationship(originuser, "", "text", msg)
 
 
+def checknewindex(type, object, idx, idxtext, connection):
+    nodes = idx[idxtext][object]
+    if len(nodes) > 0:
+        objectnode = nodes[0]
+        id = objectnode.id
+        returnnode = gdb.node[id]
+        count = returnnode.get("count") + 1
+        returnnode.set("count", count)
+    else:
+        objectnode = type.create(object, connection, count=1)
+
+    return
+
+
 def createEntity(type, object, idx, idxtext):
     # creates an entity in the database after checking if it exists
     nodes = idx[idxtext][object]
-    print len(nodes) + "" + idxtext
+    print str(len(nodes)) + " " + idxtext + " " + str(object)
 
-    if len(nodes):
+    if len(nodes) > 0:
+
         objectnode = nodes[0]
+        id = objectnode.id
+        print nodes
+        print objectnode
+        returnnode = gdb.node[id]
+        count = returnnode.get("count") + 1
+        returnnode.set("count", count)
     else:
-        objectnode = type.create(value=object)
+        objectnode = type.create(value=object, count=1)
 
     return objectnode
 
@@ -160,6 +181,10 @@ def createrelationship(originuser, object, nodetype, msg):
         msg = createEntity(messages, msgtext, messageidx, "messages")
         # user = users.create(key='slackid', value='originuser', slackid=originuser)
         user = createEntity(users, originuser, useridx, "users")
+        # checknewindex(msg.relationships, "By", messageidx, "messages", user)
+        # checknewindex(msg.relationships, "Includes", messageidx, "messages", ch)
+        # checknewindex(user.relationships, "Mentions", useridx, "users", ch)
+
         msg.relationships.create("By", user)
         msg.relationships.create("Includes", ch)
         user.relationships.create("Mentions", ch, count=1)

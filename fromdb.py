@@ -14,20 +14,38 @@ gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 @from_api.route('/api/getexploredata', methods=['GET', 'POST'])
 def getexploredata():
     nodequery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN nodes"
+    nodeoriginquery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN user"
     relquery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN r "
     # relquery = "start n=node(*) MATCH (
     # result = gdb.query(q=query,data_contents=True)
-    print("Got explorer data", request.data, nodequery, relquery)
+    print("Got explorer data", request.data, nodequery, nodeoriginquery, relquery)
     # print(nodequery)
     # print("DIR", dir(result))
     # print result.graph
     # graph = result.graph
     nodes = getNodes(gdb, nodequery)
+    start = getNodes(gdb, nodeoriginquery)
     rels = getRels(gdb, relquery)
 
+    finalnodes = []
+    finalrels = []
+
+    for node in nodes:
+        if node not in finalnodes:
+            finalnodes.append(node)
+
+    for rel in rels:
+        if rel not in finalnodes:
+            finalrels.append(rel)
+
+    # for node in start:
+    #     if node not in finalnodes:
+    #
+    finalnodes.append(start[0])
+
     result = {
-        'nodes': nodes,
-        'rels': rels
+        'nodes': finalnodes,
+        'rels': finalrels
     }
 
     # result = json.dumps(result)
@@ -45,16 +63,17 @@ def getexploredata():
 def createNodeJSON(value, uid):
     JSONObject = {
         'id': uid,
-        'value': value
+        'value': value,
+        'caption': value
     }
     return JSONObject
 
 
 def createRelsJSON(startNode, endNode, value,uid):
     JSONObject = {
-        'source': startNode,
-        'target': endNode,
-        'value': value,
+        'source': int(startNode),
+        'target': int(endNode),
+        'caption': value,
         'id': uid
     }
     return JSONObject

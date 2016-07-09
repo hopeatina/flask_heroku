@@ -23,8 +23,8 @@ function MyCtrl($scope, $http, $window) {
 
     $scope.some_data =
     {
-        "nodes": [ ],
-        "edges": [ ]
+        "nodes": [],
+        "edges": []
     };
     $scope.config = {
         dataSource: $scope.some_data
@@ -111,22 +111,39 @@ function MyCtrl($scope, $http, $window) {
             data: JSON.stringify(entityid)
         }).success(function (data) {
 
+            // $scope.alchemy.Remove();
+            var nodes = $scope.alchemy.get.allNodes("all");
+            var edges = $scope.alchemy.get.allEdges();
+
+            $scope.alchemy.remove.nodes(nodes);
+            $scope.alchemy.remove.edges(edges);
+            //
+            // $scope.alchemy.a.remove.allNodes("all");
+            // $scope.alchemy.a.remove.allEdges();
+
             $scope.returneddata = data;
             $scope.some_data = {
                 "nodes": data.nodes,
-                "edges": []
-            };
-            console.log($scope.some_data, "Got graph data");
+                "edges": data.rels
+                //     [{
+                //     "id": 290,
+                //     "source": 1,
+                //     "target": 7,
+                //     "value": "By"
+                // }]
+            }
+            ;
+            console.log(data, "Got graph data");
             $scope.config = {
                 dataSource: $scope.some_data,
                 forceLocked: false,
                 zoomControls: true,
                 initialScale: .25,
-                initialTranslate: [250,200]
+                initialTranslate: [250, 200]
                 // graphHeight: function() {return $window.innerHeight/2},
                 // graphWidth: function() {return $window.innerWidth/4}
             };
-            $scope.alchemy.Remove;
+
             $scope.alchemy = new $window.Alchemy($scope.config);
 
         }, function errorCallback(response) {

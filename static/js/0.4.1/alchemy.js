@@ -1829,6 +1829,7 @@
                 var clustering, conf, edge, nodes, styles;
                 conf = this.a.conf;
                 edge = this.a._edges[d.id][d.pos];
+                // console.log(this, d);
                 styles = this.a.svgStyles.edge.update(edge);
                 nodes = this.a._nodes;
                 if (this.a.conf.cluster) {
@@ -2585,7 +2586,7 @@
             function Edge(edge, index) {
                 var conf;
                 if (index == null) {
-                    index = null;
+                    index = 0;
                 }
                 this.allNodesActive = __bind(this.allNodesActive, this);
                 this.setProperties = __bind(this.setProperties, this);
@@ -2602,6 +2603,7 @@
                 this._properties = edge;
                 this._edgeType = this._setEdgeType();
                 this._style = conf.edgeStyle[this._edgeType] != null ? _.merge(_.clone(conf.edgeStyle["all"]), conf.edgeStyle[this._edgeType]) : _.clone(conf.edgeStyle["all"]);
+                // console.log(this);
                 this._d3 = _.merge({
                     'id': this.id,
                     'pos': this._index,
@@ -2610,6 +2612,7 @@
                     'target': this.a._nodes[this._properties.target]._d3,
                     'self': this
                 }, this.a.svgStyles.edge.populate(this));
+
                 this._setCaption(edge, conf);
                 this.a._nodes["" + edge.source]._addEdge(this);
                 this.a._nodes["" + edge.target]._addEdge(this);
