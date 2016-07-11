@@ -138,8 +138,8 @@ function MyCtrl($scope, $http, $window) {
                 dataSource: $scope.some_data,
                 forceLocked: false,
                 zoomControls: true,
-                initialScale: .25,
-                initialTranslate: [250, 200]
+                initialScale: .8,
+                initialTranslate: [100, 100]
                 // graphHeight: function() {return $window.innerHeight/2},
                 // graphWidth: function() {return $window.innerWidth/4}
             };

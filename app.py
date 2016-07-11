@@ -148,6 +148,11 @@ def createEntity(type, object, idx, idxtext):
     # creates an entity in the database after checking if it exists
     nodes = idx[idxtext][object]
     print str(len(nodes)) + " " + idxtext + " " + str(object)
+    if idxtext == "users":
+        response = sc.api_call("users.info", user=str(object))
+        img = response['user']['profile']['image_48']
+    else:
+        img = ''
 
     if len(nodes) > 0:
 
@@ -159,7 +164,7 @@ def createEntity(type, object, idx, idxtext):
         count = returnnode.get("count") + 1
         returnnode.set("count", count)
     else:
-        objectnode = type.create(value=object, count=1)
+        objectnode = type.create(value=object, count=1, type=idxtext, img=img)
 
     return objectnode
 
@@ -185,8 +190,8 @@ def createrelationship(originuser, object, nodetype, msg):
         # checknewindex(msg.relationships, "Includes", messageidx, "messages", ch)
         # checknewindex(user.relationships, "Mentions", useridx, "users", ch)
 
-        msg.relationships.create("By", user)
-        msg.relationships.create("Includes", ch)
+        msg.relationships.create("By", user, count=1)
+        msg.relationships.create("Includes", ch, count=1)
         user.relationships.create("Mentions", ch, count=1)
         channelidx["channel"][ch["value"]] = ch
         useridx["users"][user["value"]] = user
@@ -217,8 +222,8 @@ def createrelationship(originuser, object, nodetype, msg):
         msg = createEntity(messages, msgtext, messageidx, "messages")
         # user = users.create(key='slackid', value='originuser', slackid=originuser)
         user = createEntity(users, originuser, useridx, "users")
-        msg.relationships.create("By", user)
-        msg.relationships.create("Includes", lnk)
+        msg.relationships.create("By", user, count=1)
+        msg.relationships.create("Includes", lnk, count=1)
         user.relationships.create("Mentions", lnk, count=1)
         linkidx["links"][user["value"]] = lnk
         useridx["users"][user["value"]] = user
@@ -228,7 +233,7 @@ def createrelationship(originuser, object, nodetype, msg):
         msg = createEntity(messages, msgtext, messageidx, "messages")
         # user = users.create(key='slackid', value='originuser', slackid=originuser)
         user = createEntity(users, originuser, useridx, "users")
-        msg.relationships.create("By", user)
+        msg.relationships.create("By", user, count=1)
         useridx["users"][user["value"]] = user
         messageidx["messages"][msg["value"]] = msg
     return

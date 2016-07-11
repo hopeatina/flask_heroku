@@ -1308,7 +1308,7 @@
             a.elements.nodes.svg.attr("transform", function (id, i) {
                 return "translate(" + id.x + ", " + id.y + ")";
             });
-            console.log(Date() + ' completed initial computation');
+            // console.log(Date() + ' completed initial computation');
             if (!conf.forceLocked) {
                 a.force.on("tick", a.layout.tick).start();
             }
@@ -1828,8 +1828,8 @@
             edgeStyle: function (d) {
                 var clustering, conf, edge, nodes, styles;
                 conf = this.a.conf;
+                console.log(this, d);
                 edge = this.a._edges[d.id][d.pos];
-                // console.log(this, d);
                 styles = this.a.svgStyles.edge.update(edge);
                 nodes = this.a._nodes;
                 if (this.a.conf.cluster) {
