@@ -90,13 +90,13 @@ function MyCtrl($scope, $http, $window) {
         }).then(function successCallback(response) {
             $scope.responseobject = response.data;
             $scope.currentEntities = [];
-            // console.log(response);
+            console.log(response);
             // $scope.channels.push({img: "None", name: "All Channels"});
             response.data.members.forEach(function (member) {
-                $scope.currentEntities.push({img: "None", name: member.name, id: member.id});
+                $scope.currentEntities.push({img: member.profile.image_24, name: member.name, id: member.id});
 
             });
-            // console.log($scope.channels, "we made it")
+            console.log($scope.currentEntities)
         }, function errorCallback(response) {
             // called asynchronously if an error occurs
             // or server returns response with an error status.

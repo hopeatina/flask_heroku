@@ -7,18 +7,22 @@ body, html, .container-fluid {
     /*background: linear-gradient(to left, #c2e59c, #64b3f4); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
     background: url("/static/img/Seamless-Polygon-Backgrounds-Vol2/Seamless Polygon Backgrounds Vol2/Ready to use JPGs/01.jpg")
 }
+
 .center-heading {
     clear: both;
 }
+
 .center-title {
     margin-top: 10px;
     margin-bottom: 0;
     font-size: 16px;
     float: left
 }
+
 .center-button {
     /*margin-left: 190px;*/
 }
+
 .vertical-center {
     display: inline-block;
     vertical-align: middle;
@@ -31,6 +35,7 @@ body, html, .container-fluid {
     color: white;
 
 }
+
 .internal-list-full {
     overflow-y: scroll;
     height: 89%;
@@ -48,6 +53,7 @@ body, html, .container-fluid {
     margin-top: 150%;
     margin-bottom: 150%;
 }
+
 .buttontogether {
     padding-top: 200%;
 }
@@ -55,10 +61,12 @@ body, html, .container-fluid {
 .graph {
     width: 100%;
     height: 100%;
-    background: none; !important;
-    background-color:rgba(0, 0, 0, 0.5) !important;
+    background: none;
+!important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
 
 }
+
 #middle {
     /*background-color: #FC6E51;*/
     text-align: center;
@@ -80,4 +88,9 @@ body, html, .container-fluid {
 
 .within-full {
     height: 100%;
+}
+
+.categorystyle {
+    /*display: inline-flex !important;*/
+    /*margin-top: auto !important;*/
 }

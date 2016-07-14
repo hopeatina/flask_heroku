@@ -57,8 +57,8 @@
                 <option value="">Explore By User</option>
             </select></div>
             <div class="list-group internal-list">
-                <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)" class="list-group-item">
-                    <h4 class="list-group-item-heading">{{ entity.name | angular }}</h4>
+                <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)" class="list-group-item categorystyle">
+                   <img ng-src="{{ entity.img | angular }}"> <h4 class="list-group-item-heading">{{ entity.name | angular }} </h4>
                     {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
                 </a>
             </div>
