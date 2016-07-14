@@ -38,7 +38,7 @@ body, html, .container-fluid {
 
 .internal-list-full {
     overflow-y: scroll;
-    height: 89%;
+    height: 90.5%;
     color: white;
 }
 
@@ -83,7 +83,7 @@ body, html, .container-fluid {
 }
 
 #category {
-    height: 85%;
+    height: 88%;
 }
 
 .within-full {
