@@ -33,7 +33,7 @@ function MyCtrl($scope, $http, $window) {
     $scope.alchemy = new $window.Alchemy($scope.config);
 
     $scope.explorebool = false;
-    $scope.exploretext = "View Graph";
+    $scope.exploretext = "View Messages";
     $scope.explorecurrent = "Messages";
     $scope.currentEntities = [
         {img: "None", name: "channel1"}

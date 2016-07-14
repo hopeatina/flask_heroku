@@ -28,6 +28,10 @@ useridx = gdb.nodes.indexes.create("users")
 channelidx = gdb.nodes.indexes.create("channels")
 linkidx = gdb.nodes.indexes.create("links")
 messageidx = gdb.nodes.indexes.create("messages")
+byidx = gdb.relationships.indexes.create("By")
+includesidx = gdb.relationships.indexes.create("Includes")
+mentionsidx = gdb.relationships.indexes.create("Mentions")
+
 
 # token = os.environ.get('SLACKTOKEN')
 token = 'xoxp-48970123489-48964881879-50048816096-fd79da89e6'
@@ -130,16 +134,21 @@ def createnodes(entitieslist, msg, originuser):
         createrelationship(originuser, "", "text", msg)
 
 
-def checknewindex(type, object, idx, idxtext, connection):
-    nodes = idx[idxtext][object]
-    if len(nodes) > 0:
-        objectnode = nodes[0]
+def createRelEnt(relationship,relationshipidx, reltype, end, origin):
+
+    interim = origin["value"].encode('ascii', 'ignore')
+    rels = relationshipidx[reltype][interim]
+    print "Created Relationship: " + str(len(rels)) + " " + reltype + " End: " + end['value'] + " Origin: " + origin['value']
+    if len(rels) > 0:
+        objectnode = rels[0]
         id = objectnode.id
-        returnnode = gdb.node[id]
-        count = returnnode.get("count") + 1
-        returnnode.set("count", count)
+        returnrel = gdb.relationships[id]
+        count = returnrel.get("count") + 1
+        print id, returnrel.get("count"), count
+        returnrel.set("count", count)
     else:
-        objectnode = type.create(object, connection, count=1)
+        objectrel = relationship.create(reltype, end, value=end["value"].encode('ascii', 'ignore'), count=1)
+        relationshipidx[reltype][interim] = objectrel
 
     return
 
@@ -147,7 +156,7 @@ def checknewindex(type, object, idx, idxtext, connection):
 def createEntity(type, object, idx, idxtext):
     # creates an entity in the database after checking if it exists
     nodes = idx[idxtext][object]
-    print str(len(nodes)) + " " + idxtext + " " + str(object)
+    print "Created Entity: " + str(len(nodes)) + " " + idxtext + ": " + str(object)
     if idxtext == "users":
         response = sc.api_call("users.info", user=str(object))
         img = response['user']['profile']['image_48']
@@ -158,13 +167,12 @@ def createEntity(type, object, idx, idxtext):
 
         objectnode = nodes[0]
         id = objectnode.id
-        print nodes
-        print objectnode
         returnnode = gdb.node[id]
         count = returnnode.get("count") + 1
         returnnode.set("count", count)
     else:
         objectnode = type.create(value=object, count=1, type=idxtext, img=img)
+        idx[idxtext][objectnode["value"]] = objectnode
 
     return objectnode
 
@@ -176,66 +184,47 @@ def createrelationship(originuser, object, nodetype, msg):
     # print idname
 
     if nodetype == 'channel':
-        # if len(nodes):
-        #     rel = nodes[0].relationships.all(types=[tag_node["tag"]])[0]
-        # rel["count"] += 1
-        # else:
-        ch = createEntity(channels, object, channelidx, "channels")
-        # ch = channels.create(key='name', value=object, name=object)
-        # msg = messages.create(key='text',value=msgtext,text=msgtext)
-        msg = createEntity(messages, msgtext, messageidx, "messages")
-        # user = users.create(key='slackid', value='originuser', slackid=originuser)
-        user = createEntity(users, originuser, useridx, "users")
-        # checknewindex(msg.relationships, "By", messageidx, "messages", user)
-        # checknewindex(msg.relationships, "Includes", messageidx, "messages", ch)
-        # checknewindex(user.relationships, "Mentions", useridx, "users", ch)
 
-        msg.relationships.create("By", user, count=1)
-        msg.relationships.create("Includes", ch, count=1)
-        user.relationships.create("Mentions", ch, count=1)
-        channelidx["channel"][ch["value"]] = ch
-        useridx["users"][user["value"]] = user
-        messageidx["messages"][msg["value"]] = msg
+        ch = createEntity(channels, object, channelidx, "channels")
+        msg = createEntity(messages, msgtext, messageidx, "messages")
+        user = createEntity(users, originuser, useridx, "users")
+        createRelEnt(msg.relationships, byidx, "By", user, msg)
+        createRelEnt(msg.relationships, includesidx, "Includes", ch, msg)
+        createRelEnt(user.relationships, mentionsidx, "Mentions", ch, user)
+
+        # msg.relationships.create("By", user, count=1)
+        # msg.relationships.create("Includes", ch, count=1)
+        # user.relationships.create("Mentions", ch, count=1)
+        # channelidx["channels"][ch["value"]] = ch
+        # useridx["users"][user["value"]] = user
+        # messageidx["messages"][msg["value"]] = msg
     elif nodetype == 'user':
         # if len(idname) > 1:
         #     use = idname[1]
         # else:
         use = idname[0].replace('@', '')
 
-        # entuser = users.create(key='slackid',value=idname[0],slackid=idname[0],name=use)
         entuser = createEntity(users, use, useridx, "users")
-        # msg = messages.create(key='text',value=msgtext,text=msgtext)
         msg = createEntity(messages, msgtext, messageidx, "messages")
-        # user = users.create(key='slackid', value='originuser', slackid=originuser)
         user = createEntity(users, originuser, useridx, "users")
-        msg.relationships.create("By", user)
-        msg.relationships.create("Includes", entuser)
+        createRelEnt(msg.relationships, byidx, "By", user, msg)
+        createRelEnt(msg.relationships, includesidx, "Includes", entuser, msg)
         if entuser != user:
-            user.relationships.create("Mentions", entuser)
-        useridx["users"][user["value"]] = user
-        useridx["users"][entuser["value"]] = entuser
-        messageidx["messages"][msg["value"]] = msg
+            createRelEnt(user.relationships, mentionsidx, "Mentions", entuser, user)
+
     elif nodetype == 'link':
-        # lnk = links.create(key='linkid',value=object,linkid=object)
         lnk = createEntity(links, object, linkidx, "links")
-        # msg = messages.create(key='text',value=msgtext,text=msgtext)
         msg = createEntity(messages, msgtext, messageidx, "messages")
-        # user = users.create(key='slackid', value='originuser', slackid=originuser)
         user = createEntity(users, originuser, useridx, "users")
-        msg.relationships.create("By", user, count=1)
-        msg.relationships.create("Includes", lnk, count=1)
-        user.relationships.create("Mentions", lnk, count=1)
-        linkidx["links"][user["value"]] = lnk
-        useridx["users"][user["value"]] = user
-        messageidx["messages"][msg["value"]] = msg
+        createRelEnt(msg.relationships, byidx, "By", user, msg)
+        createRelEnt(msg.relationships, includesidx, "Includes", lnk, msg)
+        createRelEnt(user.relationships, mentionsidx, "Mentions", lnk, msg)
+
     else:
-        # msg = messages.create(key='text',value=msgtext,text=msgtext)
         msg = createEntity(messages, msgtext, messageidx, "messages")
-        # user = users.create(key='slackid', value='originuser', slackid=originuser)
         user = createEntity(users, originuser, useridx, "users")
-        msg.relationships.create("By", user, count=1)
-        useridx["users"][user["value"]] = user
-        messageidx["messages"][msg["value"]] = msg
+        createRelEnt(msg.relationships, byidx, "By", user, msg)
+
     return
 
 
