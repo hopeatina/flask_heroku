@@ -6,6 +6,7 @@
 var myApp = angular.module('myApp', []);
 
 myApp.controller('MyCtrl', MyCtrl)
+    .controller('HomeCtrl', HomeCtrl)
     .directive("graphDirective", function () {
         return {
             template: ""
@@ -17,7 +18,19 @@ myApp.controller('MyCtrl', MyCtrl)
 
         return d3;
     });
-
+function HomeCtrl($scope,$window) {
+    $scope.q1 = false;
+    $scope.q2 = false;
+    $scope.q3 = false;
+    $scope.q4 = false;
+    $scope.q5 = false;
+    $scope.q6 = false;
+    
+    $scope.switchFaq = function ( q) {
+        console.log(q);
+        q = q ? false : true;
+    }
+}
 function MyCtrl($scope, $http, $window) {
 
 
@@ -111,12 +124,14 @@ function MyCtrl($scope, $http, $window) {
             data: JSON.stringify(entityid)
         }).success(function (data) {
 
-            // $scope.alchemy.Remove();
+
+
             var nodes = $scope.alchemy.get.allNodes("all");
             var edges = $scope.alchemy.get.allEdges();
 
             $scope.alchemy.remove.nodes(nodes);
             $scope.alchemy.remove.edges(edges);
+
             //
             // $scope.alchemy.a.remove.allNodes("all");
             // $scope.alchemy.a.remove.allEdges();
@@ -139,7 +154,23 @@ function MyCtrl($scope, $http, $window) {
                 forceLocked: false,
                 zoomControls: true,
                 initialScale: .8,
-                initialTranslate: [100, 100]
+                initialTranslate: [100, 100],
+                nodeTypes: {"role": ["Maintainer",
+                           "Contributor",
+                           "project"]},
+                nodeStyle: {
+                    "project": {
+                        color: "#00ff0e"
+                    },
+                    "Maintainer": {
+                        color: "#00ff0e",
+                        borderColor: "#00ffda"
+                    },
+                    "Contributor": {
+                        color: "#ff7921",
+                        borderColor: "#4f07ff"
+                    }
+                }
                 // graphHeight: function() {return $window.innerHeight/2},
                 // graphWidth: function() {return $window.innerWidth/4}
             };

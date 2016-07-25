@@ -62,6 +62,11 @@ def home():
     """Render website's home page."""
     return render_template('home.html', test=test, channels=channels, msglist='')
 
+@app.route('/home')
+def fronthome():
+
+    return render_template('intro.html')
+
 
 @app.route('/api/getchannels', methods=['GET', 'POST'])
 def getchannels():
@@ -113,8 +118,8 @@ def foo(x=None, y=None):
         userencode = unicodedata.normalize('NFKD', msg['user']).encode('ascii', 'ignore')
         foundlinks.append(re.findall("<(.*?)>", msgencode))
         createnodes(re.findall("<(.*?)>", msgencode), msg, userencode)
-    return render_template('home.html', channels=channels, msglist=msglist, foundlinks=foundlinks)
-
+    # return render_template('home.html', channels=channels, msglist=msglist, foundlinks=foundlinks)
+    return
 
 def createnodes(entitieslist, msg, originuser):
     for entity in entitieslist:

@@ -64,7 +64,10 @@ def createNodeJSON(value, uid):
     JSONObject = {
         'id': uid,
         'value': value,
-        'caption': value
+        'caption': value,
+        'type': "None",
+        'image': "None",
+        'datetime': "None"
     }
     return JSONObject
 
@@ -74,6 +77,7 @@ def createRelsJSON(startNode, endNode, value,uid):
         'source': int(startNode),
         'target': int(endNode),
         'caption': value,
+        'type': "None",
         'id': uid
     }
     return JSONObject

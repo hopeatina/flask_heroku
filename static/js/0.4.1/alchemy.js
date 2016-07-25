@@ -1828,8 +1828,9 @@
             edgeStyle: function (d) {
                 var clustering, conf, edge, nodes, styles;
                 conf = this.a.conf;
-                // console.log(this, d);
-                edge = this.a._edges[d.id][d.pos];
+                // console.log(Object.keys(this.a._edges), this.a._edges[d.id], d, d.pos);
+                var choice = d.id == 0 ? "0-1" : d.id;
+                edge = this.a._edges[choice][d.pos];
                 styles = this.a.svgStyles.edge.update(edge);
                 nodes = this.a._nodes;
                 if (this.a.conf.cluster) {

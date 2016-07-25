@@ -1,6 +1,6 @@
 body, html, .container-fluid {
     margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
     height: 100%;
     /*background: #c2e59c; !* fallback for old browsers *!*/
     /*background: -webkit-linear-gradient(to left, #c2e59c, #64b3f4); !* Chrome 10-25, Safari 5.1-6 *!*/
@@ -29,11 +29,119 @@ body, html, .container-fluid {
     float: none;
 }
 
+/*.vertical-center {*/
+/*min-height: 100%;  !* Fallback for browsers do NOT support vh unit *!*/
+/*min-height: 100vh; !* These two lines are counted as one :-)       *!*/
+
+/*display: flex;*/
+/*align-items: center;*/
+/*}*/
+.titletext {
+    /*padding-bottom: 13px;*/
+    top: 13px;
+    position: absolute;
+
+}
+
+.titletext2 {
+    /*padding-bottom: 13px;*/
+    top: 13px;
+    position: absolute;
+    align-self: right;
+    height: 100%;
+    width: 100%;
+
+}
+
+.cover {
+    text-align: center;
+    height: 100%;
+}
+.cover-image-shadow{
+    height: 50%;
+    /*opacity: 1 !important;*/
+    box-shadow: 0 10px 10px  0 rgba(0, 0, 0, 0.2), 0 6px 6px 0 rgba(0, 0, 0, 0.19);
+
+}
+.cover-image{
+    height: 50%;
+    /*opacity: 1 !important;*/
+}
+.intro-section {
+    height: 80%;
+    margin-top: 2%;
+}
+.features-section {
+    height: 50%;
+    margin-top: 2%;
+    margin-bottom:2% ;
+}
+.faqs-section {
+    height: 70%;
+    margin-top: 2%;
+    margin-bottom:2% ;
+}
+
+.intro-div {
+    background: white;
+    opacity: 1;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.faqs-div {
+    background: white;
+    opacity: 1;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.features-div {
+    background: #FF9800;
+    opacity: 1;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.features-div2 {
+    background: #008aaf;
+    opacity: 1;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.fill-center {
+    height: inherit;
+}
+
+.logo {
+    height: 100px;
+    background: radial-gradient(#cedade 60%, #0092b3 90%);
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+    top: 10px;
+    position: absolute;
+}
+
 .internal-list {
     overflow-y: scroll;
     height: 90%;
     color: white;
 
+}
+
+.slackbutton {
+    margin-top: 7%;
 }
 
 .internal-list-full {
@@ -90,7 +198,8 @@ body, html, .container-fluid {
     height: 100%;
 }
 
-.categorystyle {
+.categorystyle:hover {
+    background: #3B84C3 !important;
     /*display: inline-flex !important;*/
     /*margin-top: auto !important;*/
 }
