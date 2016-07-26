@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-        <meta charset="utf-8">
+    <meta charset="utf-8">
 
     <title>{% block title %}percey.com{% endblock %}</title>
 
@@ -24,7 +24,7 @@
     <link rel="stylesheet/less" href="/static/css/main.less">
     <link rel="stylesheet" href="../static/js/0.4.1/styles/vendor.css">
     <link rel="stylesheet" href="../static/js/0.4.1/alchemy.css">
-{#    <link rel="stylesheet" href="../static/js/0.4.1/alchemy-white.css">#}
+    {#    <link rel="stylesheet" href="../static/js/0.4.1/alchemy-white.css">#}
     {% block css %}{% endblock %}
 
     <!-- Rather use `less.js` to dynamically compile your `stylesheet/less` files? -->
@@ -57,8 +57,10 @@
                 <option value="">Explore By User</option>
             </select></div>
             <div class="list-group internal-list">
-                <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)" class="list-group-item categorystyle">
-                   <img ng-src="{{ entity.img | angular }}"> <h4 class="list-group-item-heading">{{ entity.name | angular }} </h4>
+                <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)"
+                   class="list-group-item categorystyle">
+                    <img ng-src="{{ entity.img | angular }}"> <h4
+                        class="list-group-item-heading">{{ entity.name | angular }} </h4>
                     {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
                 </a>
             </div>
@@ -76,17 +78,18 @@
                     <button ng-click="switchExplore()" type="button"
                             class="btn btn-success center-button">{{ exploretext | angular }}</button>
                     <button ng-click="" type="button"
-                            class="btn btn-danger center-button">Connect</button>
+                            class="btn btn-danger center-button">Connect
+                    </button>
                 </div>
             </div>
 
-            <div  ng-show="explorebool" class="list-group internal-list-full">
+            <div ng-show="explorebool" class="list-group internal-list-full">
                 <a ng-if="some_data.nodes" ng-repeat="entity in some_data.nodes" ng-click="" class="list-group-item">
                     <h4 class="list-group-item-heading">{{ entity.value | angular }}</h4>
                     {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
                 </a>
                 <!--{% block main %}-->
-                <!--{% endblock %}-->
+                    <!--{% endblock %}-->
             </div>
             <div ng-hide="explorebool" class="list-group internal-list-full">
                 <div class='alchemy' id='alchemy'></div>
@@ -100,15 +103,31 @@
     <div class="col-md-3" id="right">
         <div class="panel panel-default within-full" style="background-color:rgba(0, 0, 0, 0.5);">
             <div class="panel-heading">Control </div>
-            <div class="vertical-center within-full">
-                <div class="buttontogether">
-                    <div class="row buttonrow">
+            <div class="within-full">
+                <div class="">
+                    <div class="">
                         <button type="button" class="btn btn-success">Filter</button>
                     </div>
-                    <div class="row buttonrow">
+                    <div class="">
+                        <div class="">
+                            <label><input type="checkbox" value="">User</label>
+                        </div>
+                        <div class="">
+                            <label><input type="checkbox" value="">Message</label>
+                        </div>
+                    </div>
+                    <div class="">
+                         <div class="">
+                            <label><input type="checkbox" value="">Link</label>
+                        </div>
+                        <div class="">
+                            <label><input type="checkbox" value="">Tags</label>
+                        </div>
+                    </div>
+                    <div class="">
                         <button type="button" class="btn btn-success">Sort</button>
                     </div>
-                    <div class="row buttonrow">
+                    <div class="">
                         <button type="button" class="btn btn-success">Magic</button>
                     </div>
                 </div>

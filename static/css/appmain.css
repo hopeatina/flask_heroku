@@ -23,19 +23,17 @@ body, html, .container-fluid {
     /*margin-left: 190px;*/
 }
 
-.vertical-center {
-    display: inline-block;
-    vertical-align: middle;
-    float: none;
-}
-
 /*.vertical-center {*/
-/*min-height: 100%;  !* Fallback for browsers do NOT support vh unit *!*/
-/*min-height: 100vh; !* These two lines are counted as one :-)       *!*/
-
-/*display: flex;*/
-/*align-items: center;*/
+    /*display: inline-block;*/
+    /*vertical-align: middle;*/
+    /*float: none;*/
 /*}*/
+
+.vertical-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .titletext {
     /*padding-bottom: 13px;*/
     top: 13px;
@@ -158,12 +156,10 @@ body, html, .container-fluid {
 }
 
 .buttonrow {
-    margin-top: 150%;
-    margin-bottom: 150%;
+    width:100%;
 }
 
 .buttontogether {
-    padding-top: 200%;
 }
 
 .graph {
@@ -196,6 +192,7 @@ body, html, .container-fluid {
 
 .within-full {
     height: 100%;
+    width:100%;
 }
 
 .categorystyle:hover {

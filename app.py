@@ -49,7 +49,7 @@ app.register_blueprint(from_api)
 # Routing for your application.
 ###
 
-@app.route('/')
+@app.route('/demo')
 def home():
     test = sc.api_call("api.test")
     channels = sc.api_call("channels.list", token=token)
@@ -62,7 +62,7 @@ def home():
     """Render website's home page."""
     return render_template('home.html', test=test, channels=channels, msglist='')
 
-@app.route('/home')
+@app.route('/')
 def fronthome():
 
     return render_template('intro.html')
