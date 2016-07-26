@@ -24,16 +24,17 @@ body, html, .container-fluid {
 }
 
 /*.vertical-center {*/
-    /*display: inline-block;*/
-    /*vertical-align: middle;*/
-    /*float: none;*/
+/*display: inline-block;*/
+/*vertical-align: middle;*/
+/*float: none;*/
 /*}*/
 
 .vertical-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .titletext {
     /*padding-bottom: 13px;*/
     top: 13px;
@@ -54,30 +55,36 @@ body, html, .container-fluid {
 .cover {
     text-align: center;
     height: 100%;
+    top: 10%;
 }
-.cover-image-shadow{
+
+.cover-image-shadow {
     height: 50%;
     /*opacity: 1 !important;*/
-    box-shadow: 0 10px 10px  0 rgba(0, 0, 0, 0.2), 0 6px 6px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 6px 0 rgba(0, 0, 0, 0.19);
 
 }
-.cover-image{
+
+.cover-image {
     height: 50%;
     /*opacity: 1 !important;*/
 }
+
 .intro-section {
     height: 80%;
     margin-top: 2%;
 }
+
 .features-section {
     height: 50%;
     margin-top: 2%;
-    margin-bottom:2% ;
+    margin-bottom: 2%;
 }
+
 .faqs-section {
     height: 70%;
     margin-top: 2%;
-    margin-bottom:2% ;
+    margin-bottom: 2%;
 }
 
 .intro-div {
@@ -89,6 +96,7 @@ body, html, .container-fluid {
     height: 100%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
 .faqs-div {
     background: white;
     opacity: 1;
@@ -98,6 +106,7 @@ body, html, .container-fluid {
     height: 100%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
 .features-div {
     background: #FF9800;
     opacity: 1;
@@ -107,6 +116,7 @@ body, html, .container-fluid {
     height: 100%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
 .features-div2 {
     background: #008aaf;
     opacity: 1;
@@ -119,6 +129,11 @@ body, html, .container-fluid {
 
 .fill-center {
     height: inherit;
+}
+
+.adjust {
+    left: 23%;
+    position: relative;
 }
 
 .logo {
@@ -156,7 +171,7 @@ body, html, .container-fluid {
 }
 
 .buttonrow {
-    width:100%;
+    width: 100%;
 }
 
 .buttontogether {
@@ -192,7 +207,7 @@ body, html, .container-fluid {
 
 .within-full {
     height: 100%;
-    width:100%;
+    width: 100%;
 }
 
 .categorystyle:hover {
