@@ -13,9 +13,9 @@ gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 
 @from_api.route('/api/getexploredata', methods=['GET', 'POST'])
 def getexploredata():
-    nodequery = "MATCH (nodes)<-[r]- (user:User {value:" + request.data + "}) RETURN nodes"
-    nodeoriginquery = "MATCH (nodes)<-[r]- (user:User {value:" + request.data + "}) RETURN user"
-    relquery = "MATCH (nodes)<-[r]- (user:User {value:" + request.data + "}) RETURN r "
+    nodequery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN nodes"
+    nodeoriginquery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN user"
+    relquery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN r "
     # relquery = "start n=node(*) MATCH (
     # result = gdb.query(q=query,data_contents=True)
     print("Got explorer data", request.data, nodequery, nodeoriginquery, relquery)
