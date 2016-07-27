@@ -117,15 +117,16 @@
                         <div ng-if="!selectedCatBool">Select a user to connect</div>
                         {{ selectedCatItem.name | angular }}
                     </div>
-                    <div class="col-md-1"><img ng-src="{{ selectedCatItem.img | angular }}"></div>
+                    <div class="col-md-1">
+                        <img ng-if="!selectedCatBool" src="/static/img/place_holderpic.png">
+                        <img ng-src="{{ selectedCatItem.img | angular }}"></div>
                     <div class="col-md-2">with</div>
-                    <div class="col-md-1">pic 2</div>
+                    <div class="col-md-1"><img src="/static/img/place_holderpic.png"></div>
                     <div class="col-md-4">Pick their match below</div>
                 </div>
                 <div class="comparison">
                     <div class="col-md-3 fill-height">Suggested Matches</div>
                     <div class="col-md-6 center-comparison fill-height">
-                        Compare
                         <div class="score-row">
                             <div class="col-md-5">23</div>
                             <div class="col-md-2">Score</div>
@@ -134,7 +135,8 @@
                         Tags
                         <div class="tags-row">
                             <div class="col-md-12">
-                                <button ng-repeat="tag in userOneTags" type="button" class="btn btn-danger tag-button ">{{ tag | angular }}</button>
+                                <button ng-repeat="tag in userOneTags" type="button"
+                                        class="btn btn-danger tag-button ">{{ tag | angular }}</button>
                             </div>
                         </div>
                     </div>

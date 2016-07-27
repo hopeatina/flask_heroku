@@ -43,6 +43,9 @@ function MyCtrl($scope, $http, $window) {
         dataSource: $scope.some_data
     };
 
+    $scope.suggestedMatches = [
+        ["img", "image1"]
+    ];
     $scope.alchemy = new $window.Alchemy($scope.config);
 
     $scope.explorebool = false;
@@ -118,6 +121,11 @@ function MyCtrl($scope, $http, $window) {
             $scope.currentEntities = [{img: "", name: "All Users", id: -1}];
             console.log(response);
             // $scope.channels.push({img: "None", name: "All Channels"});
+            var i = 0;
+            for (i=0; i < 6; i++)
+                $scope.suggestedMatches.push([response.data.members[Math.floor(Math.random() * response.data.members.length)],
+                    response.data.members[Math.floor(Math.random() * response.data.members.length)]]) ;
+            console.log($scope.suggestedMatches);
             response.data.members.forEach(function (member) {
                 $scope.currentEntities.push({img: member.profile.image_24, name: member.name, id: member.id});
 

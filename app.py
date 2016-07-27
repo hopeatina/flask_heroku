@@ -214,8 +214,7 @@ def createrelationship(originuser, object, nodetype, msg):
         user = createEntity(users, originuser, useridx, "users")
         createRelEnt(msg.relationships, byidx, "By", user, msg)
         createRelEnt(msg.relationships, includesidx, "Includes", entuser, msg)
-        if entuser != user:
-            createRelEnt(user.relationships, mentionsidx, "Mentions", entuser, user)
+        createRelEnt(user.relationships, mentionsidx, "Mentions", entuser, user)
 
     elif nodetype == 'link':
         lnk = createEntity(links, object, linkidx, "links")
