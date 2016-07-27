@@ -21,6 +21,7 @@ body, html, .container-fluid {
 
 .center-button {
     /*margin-left: 190px;*/
+    margin-top: 3%;
 }
 
 /*.vertical-center {*/
@@ -40,6 +41,9 @@ body, html, .container-fluid {
     top: 13px;
     position: absolute;
 
+}
+.demo {
+    color: inherit;
 }
 
 .titletext2 {
@@ -159,7 +163,7 @@ body, html, .container-fluid {
 
 .internal-list-full {
     overflow-y: scroll;
-    height: 90.5%;
+    height: 92%;
     color: white;
 }
 
@@ -195,7 +199,8 @@ body, html, .container-fluid {
 }
 
 #right {
-    height: 95%;
+    /*height: 95%;*/
+    height: 55%;
     /*background-color: #4FC1E9;*/
     text-align: center;
     padding: 20px;
@@ -208,6 +213,50 @@ body, html, .container-fluid {
 .within-full {
     height: 100%;
     width: 100%;
+    color: white;
+}
+.within-short {
+    height: 75%;
+    width: 100%;
+    color: white;
+}
+.connect {
+    background-color: floralwhite;
+    color: black;
+}
+.connect-row {
+    height:12%;
+}
+.comparison {
+    height: 50%;
+}
+.fill-height {
+    height: 100%;
+}
+.select-button {
+    margin-top: 5%;
+    font-size: 16px;
+}
+.tag-button {
+    margin: 2%;
+    font-size: 12px;
+}
+.tags-row {
+    height: 60%;
+    overflow-y: scroll;
+}
+.score-row {
+    height: 20%;
+}
+.center-comparison{
+    background: lightskyblue;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius: 10px;
+}
+.empty {
+    top: 20%;
+    position: relative;
 }
 
 .categorystyle:hover {
@@ -215,3 +264,20 @@ body, html, .container-fluid {
     /*display: inline-flex !important;*/
     /*margin-top: auto !important;*/
 }
+
+.magicbutton {
+    margin-top: 5%;
+}
+/*** custom checkboxes ***/
+
+input[type=checkbox] { display:none; } /* to hide the checkbox itself */
+input[type=checkbox] + label:before {
+  font-family: FontAwesome;
+  display: inline-block;
+}
+
+input[type=checkbox] + label:before { content: "\f096"; } /* unchecked icon */
+input[type=checkbox] + label:before { letter-spacing: 10px; } /* space between checkbox and label */
+
+input[type=checkbox]:checked + label:before { content: "\f046"; } /* checked icon */
+input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow space for check mark */

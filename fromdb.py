@@ -13,9 +13,9 @@ gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 
 @from_api.route('/api/getexploredata', methods=['GET', 'POST'])
 def getexploredata():
-    nodequery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN nodes"
-    nodeoriginquery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN user"
-    relquery = "MATCH (nodes)-[r]-> (user:User {value:" + request.data + "}) RETURN r "
+    nodequery = "MATCH (nodes)<-[r]- (user:User {value:" + request.data + "}) RETURN nodes"
+    nodeoriginquery = "MATCH (nodes)<-[r]- (user:User {value:" + request.data + "}) RETURN user"
+    relquery = "MATCH (nodes)<-[r]- (user:User {value:" + request.data + "}) RETURN r "
     # relquery = "start n=node(*) MATCH (
     # result = gdb.query(q=query,data_contents=True)
     print("Got explorer data", request.data, nodequery, nodeoriginquery, relquery)
@@ -30,6 +30,7 @@ def getexploredata():
     finalnodes = []
     finalrels = []
 
+    print "START: " + str(start)
     for node in nodes:
         if node not in finalnodes:
             finalnodes.append(node)
@@ -41,7 +42,8 @@ def getexploredata():
     # for node in start:
     #     if node not in finalnodes:
     #
-    finalnodes.append(start[0])
+    if start != []:
+        finalnodes.append(start[0])
 
     result = {
         'nodes': finalnodes,
@@ -59,15 +61,24 @@ def getexploredata():
     # return jsonify({"list": "channels"})
     return jsonify(result)
 
+def createNodeStats():
+    nodestats = []
+    return nodestats
 
-def createNodeJSON(value, uid):
+def createGraphStats():
+    graphstats = []
+    return graphstats
+
+
+
+def createNodeJSON(value, uid, nodetype, img, date, name):
     JSONObject = {
         'id': uid,
         'value': value,
-        'caption': value,
-        'type': "None",
-        'image': "None",
-        'datetime': "None"
+        'caption': name,
+        'type': nodetype,
+        'image': img,
+        'datetime': date
     }
     return JSONObject
 
@@ -77,7 +88,7 @@ def createRelsJSON(startNode, endNode, value,uid):
         'source': int(startNode),
         'target': int(endNode),
         'caption': value,
-        'type': "None",
+        'type': value,
         'id': uid
     }
     return JSONObject
@@ -113,13 +124,18 @@ def getNodes(db, query):
         name = data.get('name')
         description = data.get('description')
         value = data.get('value')
+        nodetype = data.get('type')
+        img = data.get('img')
+        date = data.get('date')
+        if name == None:
+            name = value
 
         self = n.get('self')
-        # print self
+        print name, value, nodetype, img, date
         # self = urlparse(self)
         # uid = doRegEX(self)
 
-        nodeJSON.append(createNodeJSON(value, uid))
+        nodeJSON.append(createNodeJSON(value, uid, nodetype, img, date, name))
 
     return nodeJSON
 

@@ -93,9 +93,6 @@ def getcategories():
 #     print("DIR", dir(result))
 #     # print result.graph
 #     # graph = result.graph
-#
-#
-#
 #     # return jsonify({"list": "channels"})
 #     return result
 
@@ -113,13 +110,14 @@ def foo(x=None, y=None):
     channels = sc.api_call("channels.list", token=token)
     msglist = sc.api_call("channels.history", token=token, channel=id)
     foundlinks = []
+    test = "TEST TEXT"
     for msg in msglist['messages']:
         msgencode = unicodedata.normalize('NFKD', msg['text']).encode('ascii', 'ignore')
         userencode = unicodedata.normalize('NFKD', msg['user']).encode('ascii', 'ignore')
         foundlinks.append(re.findall("<(.*?)>", msgencode))
         createnodes(re.findall("<(.*?)>", msgencode), msg, userencode)
     # return render_template('home.html', channels=channels, msglist=msglist, foundlinks=foundlinks)
-    return
+    return render_template('home.html', test=test, channels=channels, msglist='')
 
 def createnodes(entitieslist, msg, originuser):
     for entity in entitieslist:
@@ -165,18 +163,20 @@ def createEntity(type, object, idx, idxtext):
     if idxtext == "users":
         response = sc.api_call("users.info", user=str(object))
         img = response['user']['profile']['image_48']
+        name = response['user']
     else:
         img = ''
+        dateTime = ''
+        name = ''
 
     if len(nodes) > 0:
-
         objectnode = nodes[0]
         id = objectnode.id
         returnnode = gdb.node[id]
         count = returnnode.get("count") + 1
         returnnode.set("count", count)
     else:
-        objectnode = type.create(value=object, count=1, type=idxtext, img=img)
+        objectnode = type.create(value=object, count=1, type=idxtext, img=img, date="JULY 26, 2016")
         idx[idxtext][objectnode["value"]] = objectnode
 
     return objectnode

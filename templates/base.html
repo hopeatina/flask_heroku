@@ -59,8 +59,14 @@
             <div class="list-group internal-list">
                 <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)"
                    class="list-group-item categorystyle">
-                    <img ng-src="{{ entity.img | angular }}"> <h4
-                        class="list-group-item-heading">{{ entity.name | angular }} </h4>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <img ng-src="{{ entity.img | angular }}">
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="list-group-item-heading">{{ entity.name | angular }} </h4>
+                        </div>
+                    </div>
                     {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
                 </a>
             </div>
@@ -71,32 +77,80 @@
     <div class="col-md-6" id="middle">
         <div class="panel panel-primary within-full" style="background-color:rgba(0, 0, 0, 0.5);">
             <div class="panel-heading ">
-                <div class="center-heading">
-                    <h1 class="center-title panel-title "
-                        style="margin-top: 10px; float: left;">
-                        Explore {{ selectedCatItem | angular }}'s {{ explorecurrent | angular }}</h1>
-                    <button ng-click="switchExplore()" type="button"
-                            class="btn btn-success center-button">{{ exploretext | angular }}</button>
-                    <button ng-click="" type="button"
-                            class="btn btn-danger center-button">Connect
-                    </button>
+                <div class="row center-heading">
+                    <div class="col-md-6">
+                        <h1 ng-if="connected" class="center-title panel-title " style="margin-top: 10px; float: left;">
+                            Explore {{ selectedCatItem.name | angular }}'s {{ explorecurrent | angular }}</h1>
+                        <h1 ng-if="!connected" class="center-title panel-title " style="margin-top: 10px; float: left;">
+                            Connect</h1>
+                    </div>
+                    <div class="col-md-5 pull-right">
+                        <button ng-click="switchExplore()" type="button"
+                                class="btn btn-success ">{{ exploretext | angular }}</button>
+                        <button ng-click="switchConnect()" type="button" class="btn btn-danger ">Connect</button>
+                    </div>
                 </div>
             </div>
 
-            <div ng-show="explorebool" class="list-group internal-list-full">
-                <a ng-if="some_data.nodes" ng-repeat="entity in some_data.nodes" ng-click="" class="list-group-item">
-                    <h4 class="list-group-item-heading">{{ entity.value | angular }}</h4>
-                    {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
-                </a>
-                <!--{% block main %}-->
-                    <!--{% endblock %}-->
+            <div ng-show="connected" class="list-group internal-list-full">
+                <div ng-show="explorebool" class="list-group">
+                    <a ng-if="some_data.nodes" ng-repeat="entity in some_data.nodes" ng-click=""
+                       class="list-group-item">
+                        <h4 class="list-group-item-heading">{{ entity.value | angular }}</h4>
+                        {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
+                    </a>
+                    {% block main %}
+                    {% endblock %}
+                </div>
+                <div ng-hide="explorebool" style="height: 100%;">
+                    <div ng-show="graphstatebool" class='alchemy' id='alchemy'></div>
+                    <div ng-hide="graphstatebool" class="empty"><img src="/static/img/logo2.png" style="height: 150px">
+                        <h4> Hey There! Click on a member on the left to visualize their Connections.</h4></div>
+                    <script src="../static/js/0.4.1/scripts/vendor.js"></script>
+                    <script src="../static/js/0.4.1/alchemy.js"></script>
+                </div>
             </div>
-            <div ng-hide="explorebool" class="list-group internal-list-full">
-                <div class='alchemy' id='alchemy'></div>
-                <script src="../static/js/0.4.1/scripts/vendor.js"></script>
-                <script src="../static/js/0.4.1/alchemy.js"></script>
-
-
+            <div ng-if="!connected" class="list-group internal-list-full connect">
+                <h3>Connect</h3>
+                <div class="connect-row">
+                    <div class="col-md-4">
+                        <div ng-if="!selectedCatBool">Select a user to connect</div>
+                        {{ selectedCatItem.name | angular }}
+                    </div>
+                    <div class="col-md-1"><img ng-src="{{ selectedCatItem.img | angular }}"></div>
+                    <div class="col-md-2">with</div>
+                    <div class="col-md-1">pic 2</div>
+                    <div class="col-md-4">Pick their match below</div>
+                </div>
+                <div class="comparison">
+                    <div class="col-md-3 fill-height">Suggested Matches</div>
+                    <div class="col-md-6 center-comparison fill-height">
+                        Compare
+                        <div class="score-row">
+                            <div class="col-md-5">23</div>
+                            <div class="col-md-2">Score</div>
+                            <div class="col-md-5">96</div>
+                        </div>
+                        Tags
+                        <div class="tags-row">
+                            <div class="col-md-12">
+                                <button ng-repeat="tag in userOneTags" type="button" class="btn btn-danger tag-button ">{{ tag | angular }}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 fill-height">
+                        List of options
+                    </div>
+                </div>
+                <div class="connect-row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <button ng-click="" type="button"
+                                class="btn btn-success select-button">Select
+                        </button>
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -106,68 +160,102 @@
             <div class="within-full">
                 <div class="">
                     <div class="">
-                        <button type="button" class="btn btn-success">Filter</button>
+                        <h3>Filter</h3>
                     </div>
-                    <div class="">
-                        <div class="">
-                            <label><input type="checkbox" value="">User</label>
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6">
+                            <input id="box1" type="checkbox"/>
+                            <label for="box1">User</label>
+                            {#                            <label><input type="checkbox" value="">User</label>#}
                         </div>
-                        <div class="">
-                            <label><input type="checkbox" value="">Message</label>
-                        </div>
-                    </div>
-                    <div class="">
-                         <div class="">
-                            <label><input type="checkbox" value="">Link</label>
-                        </div>
-                        <div class="">
-                            <label><input type="checkbox" value="">Tags</label>
+                        <div class="col-md-6 col-xs-6">
+                            <input id="box2" type="checkbox"/>
+                            <label for="box2">Message</label>
                         </div>
                     </div>
-                    <div class="">
-                        <button type="button" class="btn btn-success">Sort</button>
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6">
+                            <input id="box3" type="checkbox"/>
+                            <label for="box3">Link</label>
+                        </div>
+                        <div class="col-md-6 col-xs-6">
+                            <input id="box4" type="checkbox"/>
+                            <label for="box4">Tags</label>
+                        </div>
                     </div>
                     <div class="">
-                        <button type="button" class="btn btn-success">Magic</button>
+                        <h3>Sort</h3>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <label> Time</label>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <label>Connections</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <label>Activity</label>
+                            </div>
+                            <div class="col-md-6  col-xs-6">
+                                <label>Score</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="">
+                        <button type="button" class="btn btn-success magicbutton">Magic</button>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="panel panel-default within-short" style="background-color:rgba(0, 0, 0, 0.5);">
+            <div class="panel-heading">More Info </div>
+            <div class="within-short">
+                <div>Created Date
+                    <div/>
+                    <div>Density</div>
+                    <div>Number of Nodes</div>
+                    <div>Number of Relationships</div>
+                    <div> Betweeness</div>
+                    <div>Msgs/Day</div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
-</div>
+
+    {#<footer>#}
+    {#    {% include "footer.html" %}#}
+    {#</footer>#}
 
 
-{#<footer>#}
-{#    {% include "footer.html" %}#}
-{#</footer>#}
+    <!-- JavaScript at the bottom for fast page loading -->
+
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/static/js/libs/jquery.js">\x3C/script>')</script>
 
 
-<!-- JavaScript at the bottom for fast page loading -->
-
-<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/static/js/libs/jquery.js">\x3C/script>')</script>
+    <!-- Additional JavaScript libraries and plugins... -->
+    {% block js %}{% endblock %}
 
 
-<!-- Additional JavaScript libraries and plugins... -->
-{% block js %}{% endblock %}
+    <!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
+    <script>
+        var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+        (function (d, t) {
+            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+            g.async = 1;
+            g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g, s)
+        }(document, 'script'));
+    </script>
 
 
-<!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
-<script>
-    var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
-    (function (d, t) {
-        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-        g.async = 1;
-        g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g, s)
-    }(document, 'script'));
-</script>
-
-
-<!-- Prompt IE < 8 users to install Chrome Frame.  -->
-<!--[if lt IE 8 ]>
+    <!-- Prompt IE < 8 users to install Chrome Frame.  -->
+    <!--[if lt IE 8 ]>
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->
