@@ -43,18 +43,19 @@ function MyCtrl($scope, $http, $window) {
         dataSource: $scope.some_data
     };
 
-    $scope.suggestedMatches = [
-        ["img", "image1"]
-    ];
+    $scope.suggestedMatches = [];
     $scope.alchemy = new $window.Alchemy($scope.config);
 
+    $scope.matchmade = false;
     $scope.explorebool = false;
-    $scope.connected = true;
-    $scope.selectedCatBool = false;
+    $scope.connected = false;
+    $scope.userOneBool = false;
+    $scope.userTwoBool = false;
+    $scope.selectDisabled = "disabled";
     $scope.exploretext = "View Messages";
     $scope.explorecurrent = "Messages";
     $scope.currentEntities = [
-        {img: "None", name: "channel1"}
+        {img: "static/img/place_holderpic.png", name: "channel1"}
     ];
     $scope.typeOptions = [
         {name: 'Explore by Topic', value: 'feature'}
@@ -70,7 +71,7 @@ function MyCtrl($scope, $http, $window) {
     $scope.form = {type: $scope.typeOptions[0].value};
     $scope.responseobject = "RESPONSE OBJECT GOES HERE";
     $scope.graphstyle = "background-color:rgba(0, 0, 0, 0.5) !important;";
-    $scope.graphstatebool = false; 
+    $scope.graphstatebool = false;
 
     $scope.switchExplore = function () {
         console.log($scope.connected);
@@ -85,16 +86,21 @@ function MyCtrl($scope, $http, $window) {
         console.log($scope.connected)
     };
     $scope.switchCatSelection = function (entity) {
-        $scope.selectedCatItem = entity;
-        $scope.selectedCatBool = true;
+        $scope.userOne = entity;
+        $scope.userOneBool = true;
         if (entity.id != -1 && $scope.connected)
             $scope.getGraphData(entity.id);
         else
             $scope.getUserOneData(entity.id);
         console.log(entity);
+        if ($scope.userOneBool && $scope.userTwoBool) {
+            $scope.selectDisabled = "";
+        }
 
     };
-
+    $scope.switchConnectInner = function () {
+        $scope.matchmade = !$scope.matchmade;
+    };
     $scope.testAPI = function () {
         $http({
             method: 'GET',
@@ -118,16 +124,31 @@ function MyCtrl($scope, $http, $window) {
             url: '/api/getcategories'
         }).then(function successCallback(response) {
             $scope.responseobject = response.data;
-            $scope.currentEntities = [{img: "", name: "All Users", id: -1}];
+            $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: -1}];
             console.log(response);
             // $scope.channels.push({img: "None", name: "All Channels"});
-            var i = 0;
-            for (i=0; i < 6; i++)
-                $scope.suggestedMatches.push([response.data.members[Math.floor(Math.random() * response.data.members.length)],
-                    response.data.members[Math.floor(Math.random() * response.data.members.length)]]) ;
-            console.log($scope.suggestedMatches);
+            var i;
+            for (i = 0; i < 5; i++) {
+                var p1 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
+                var p2 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
+                console.log($scope.suggestedMatches);
+                $scope.suggestedMatches.push(
+                    {
+                        "user1": {
+                            "img": p1.profile.image_32,
+                            "name": p1.name,
+                            "id": p1.id
+                        },
+                        "user2": {
+                            "img": p2.profile.image_32,
+                            "name": p2.name,
+                            "id": p2.id
+                        }
+                    });
+            }
+
             response.data.members.forEach(function (member) {
-                $scope.currentEntities.push({img: member.profile.image_24, name: member.name, id: member.id});
+                $scope.currentEntities.push({img: member.profile.image_32, name: member.name, id: member.id});
 
             });
             console.log($scope.currentEntities)
@@ -138,7 +159,7 @@ function MyCtrl($scope, $http, $window) {
         });
     };
     $scope.getGraphData = function (entityid) {
-        $scope.graphstatebool = true; 
+        $scope.graphstatebool = true;
         $http({
             url: '/api/getexploredata',
             method: "POST",
@@ -147,30 +168,29 @@ function MyCtrl($scope, $http, $window) {
         }).success(function (data) {
 
             if (data == [])
-                $scope.graphstatebool = false; 
+                $scope.graphstatebool = false;
 
             var nodes = $scope.alchemy.get.allNodes("all");
             var edges = $scope.alchemy.get.allEdges();
 
             $scope.alchemy.remove.nodes(nodes);
             $scope.alchemy.remove.edges(edges);
-            var iEl = angular.element( document.querySelector( '#alchemy > svg:nth-child(1)' ) );
+            var iEl = angular.element(document.querySelector('#alchemy > svg:nth-child(1)'));
             iEl.remove();
             // $scope.alchemy.updateGraph();
 
-            
 
             //
             // $scope.alchemy.a.remove.allNodes("all");
             // $scope.alchemy.a.remove.allEdges();
 
             var textArray = [
-                    'links',
-                    'channels',
-                    'messages',
-                    'users',
-                    'tags'
-                ];
+                'links',
+                'channels',
+                'messages',
+                'users',
+                'tags'
+            ];
             $scope.returneddata = data;
             // data.nodes.forEach(function (node) {
             //     var randomNumber = Math.floor(Math.random() * textArray.length);
@@ -236,15 +256,32 @@ function MyCtrl($scope, $http, $window) {
 
     };
     $scope.getUserOneData = function (id) {
-        $scope.userOneScore = 23;
-        $scope.userOneTags = [
+        $scope.userOne.score = 23;
+        $scope.userOne.tags = [
             "Zika", "IBM", "Watson",
             "Awesome", "Sauce", "Juice",
             "Chicken", "Rice", "Fufu",
             "Orange Soda", "Tech", "Life"
         ];
     };
-
+    $scope.updateMatch = function (match) {
+        $scope.userOne = match.user1;
+        $scope.userTwo = match.user2;
+        $scope.userTwoBool = true;
+        $scope.userOneBool = true;
+        $scope.selectDisabled = "";
+    };
+    $scope.updateUserTwo = function(user2) {
+        $scope.userTwo = user2;
+        $scope.userTwoBool = true;
+        if (!$scope.userOneBool && !$scope.userTwoBool) {
+            $scope.selectDisabled = "";
+        }
+    };
+    $scope.sendMatch = function() {
+        $scope.switchConnectInner();
+        $scope.introText = "";
+    };
 
 
     $scope.testAPI();

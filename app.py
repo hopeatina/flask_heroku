@@ -23,14 +23,16 @@ users = gdb.labels.create("User")
 channels = gdb.labels.create("Channel")
 links = gdb.labels.create("Link")
 messages = gdb.labels.create("Message")
+tags = gdb.labels.create("Tag")
 
 useridx = gdb.nodes.indexes.create("users")
 channelidx = gdb.nodes.indexes.create("channels")
 linkidx = gdb.nodes.indexes.create("links")
 messageidx = gdb.nodes.indexes.create("messages")
-byidx = gdb.relationships.indexes.create("By")
-includesidx = gdb.relationships.indexes.create("Includes")
-mentionsidx = gdb.relationships.indexes.create("Mentions")
+byidx = gdb.relationships.indexes.create("by")
+includesidx = gdb.relationships.indexes.create("includes")
+mentionsidx = gdb.relationships.indexes.create("mentions")
+tagsidx = gdb.relationships.indexes.create("tags")
 
 
 # token = os.environ.get('SLACKTOKEN')
@@ -114,22 +116,33 @@ def foo(x=None, y=None):
     for msg in msglist['messages']:
         msgencode = unicodedata.normalize('NFKD', msg['text']).encode('ascii', 'ignore')
         userencode = unicodedata.normalize('NFKD', msg['user']).encode('ascii', 'ignore')
-        foundlinks.append(re.findall("<(.*?)>", msgencode))
+        # foundlinks.append(re.findall("<(.*?)>", msgencode))
+        # Parse msg for top 3 tags
+        # Check then Create Tag
+        # Connect Message to Tag
+        # Connect User to Tag
         createnodes(re.findall("<(.*?)>", msgencode), msg, userencode)
-    # return render_template('home.html', channels=channels, msglist=msglist, foundlinks=foundlinks)
     return render_template('home.html', test=test, channels=channels, msglist='')
 
 def createnodes(entitieslist, msg, originuser):
+
+    #remove entitieslist from ms
+    noentitymsg = removeent(msg['text'])
+
+    tags = parseTags(noentitymsg)
+    for tag in tags:
+        createrelationship(originuser, tag, "tag", msg)
+
     for entity in entitieslist:
-        if entity[:2] == "#C":
+        if entity[:2] == "#C": # Channel
             # print "Channel: " + entity
             createrelationship(originuser, entity, "channel", msg)
-        elif entity[:2] == "@U":
+        elif entity[:2] == "@U": # User
             # print "User: " + entity
             createrelationship(originuser, entity, "user", msg)
-        elif entity[:1] == "!":
+        elif entity[:1] == "!": #Special?
             specials()
-        else:
+        else: #Link
             # print "Link: " + entity
             createrelationship(originuser, entity, "link", msg)
 
@@ -141,7 +154,7 @@ def createRelEnt(relationship,relationshipidx, reltype, end, origin):
 
     interim = origin["value"].encode('ascii', 'ignore')
     rels = relationshipidx[reltype][interim]
-    print "Created Relationship: " + str(len(rels)) + " " + reltype + " End: " + end['value'] + " Origin: " + origin['value']
+    print "Created Relationship: " + str(len(rels)) + ", " + reltype + ", Origin: " + origin['value'] + ", End: " + end['value']
     if len(rels) > 0:
         objectnode = rels[0]
         id = objectnode.id
@@ -193,13 +206,13 @@ def createrelationship(originuser, object, nodetype, msg):
         ch = createEntity(channels, object, channelidx, "channels")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "By", user, msg)
-        createRelEnt(msg.relationships, includesidx, "Includes", ch, msg)
-        createRelEnt(user.relationships, mentionsidx, "Mentions", ch, user)
+        createRelEnt(msg.relationships, byidx, "by", user, msg)
+        createRelEnt(msg.relationships, includesidx, "includes", ch, msg)
+        createRelEnt(user.relationships, mentionsidx, "mentions", ch, user)
 
-        # msg.relationships.create("By", user, count=1)
-        # msg.relationships.create("Includes", ch, count=1)
-        # user.relationships.create("Mentions", ch, count=1)
+        # msg.relationships.create("by", user, count=1)
+        # msg.relationships.create("includes", ch, count=1)
+        # user.relationships.create("mentions", ch, count=1)
         # channelidx["channels"][ch["value"]] = ch
         # useridx["users"][user["value"]] = user
         # messageidx["messages"][msg["value"]] = msg
@@ -212,24 +225,51 @@ def createrelationship(originuser, object, nodetype, msg):
         entuser = createEntity(users, use, useridx, "users")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "By", user, msg)
-        createRelEnt(msg.relationships, includesidx, "Includes", entuser, msg)
-        createRelEnt(user.relationships, mentionsidx, "Mentions", entuser, user)
+        createRelEnt(msg.relationships, byidx, "by", user, msg)
+        createRelEnt(msg.relationships, includesidx, "includes", entuser, msg)
+        createRelEnt(user.relationships, mentionsidx, "mentions", entuser, user)
 
     elif nodetype == 'link':
         lnk = createEntity(links, object, linkidx, "links")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "By", user, msg)
-        createRelEnt(msg.relationships, includesidx, "Includes", lnk, msg)
-        createRelEnt(user.relationships, mentionsidx, "Mentions", lnk, msg)
+        createRelEnt(msg.relationships, byidx, "by", user, msg)
+        createRelEnt(msg.relationships, includesidx, "includes", lnk, msg)
+        createRelEnt(user.relationships, mentionsidx, "mentions", lnk, msg)
+
+    elif nodetype == 'tag':
+        tag = createEntity(tags, object, tagsidx,"tags")
+        msg = createEntity(messages, msgtext, messageidx, "messages")
+        user = createEntity(users, originuser, useridx, "users")
+        createRelEnt(msg.relationships, includesidx, "includes", tag, msg)
+        createRelEnt(user.relationships, mentionsidx, "mentions", tag, msg)
+        createRelEnt(msg.relationships, byidx, "by", user, msg)
+
+
+
 
     else:
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "By", user, msg)
+        createRelEnt(msg.relationships, byidx, "by", user, msg)
 
     return
+
+def createNodeStats():
+    nodestats = []
+    return nodestats
+
+def createGraphStats():
+    graphstats = []
+    return graphstats
+
+def parseTags(msg):
+    tags = []
+    return tags
+def removeent(msg):
+    msg = ""
+    return msg
+
 
 
 def specials():
