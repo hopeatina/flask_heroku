@@ -5,34 +5,40 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 
 This file creates your application.
 """
-
+from __future__ import division
 import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import logging
 from slackclient import SlackClient
 import unicodedata
 from neo4jrestclient.client import GraphDatabase
+from neo4jrestclient.constants import RAW
 from neo4jrestclient import client
 from flask.ext.triangle import Triangle
 import re
 from fromdb import from_api
-
+import operator
+from nltk import pos_tag
+import nltk
+import string
 
 gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 users = gdb.labels.create("User")
 channels = gdb.labels.create("Channel")
 links = gdb.labels.create("Link")
 messages = gdb.labels.create("Message")
-tags = gdb.labels.create("Tag")
+Tags = gdb.labels.create("Tag")
 
 useridx = gdb.nodes.indexes.create("users")
 channelidx = gdb.nodes.indexes.create("channels")
 linkidx = gdb.nodes.indexes.create("links")
 messageidx = gdb.nodes.indexes.create("messages")
-byidx = gdb.relationships.indexes.create("by")
-includesidx = gdb.relationships.indexes.create("includes")
-mentionsidx = gdb.relationships.indexes.create("mentions")
-tagsidx = gdb.relationships.indexes.create("tags")
+Tagsidx = gdb.nodes.indexes.create("Tags")
+
+Byidx = gdb.relationships.indexes.create("By")
+Includesidx = gdb.relationships.indexes.create("Includes")
+Mentionsidx = gdb.relationships.indexes.create("Mentions")
+
 
 
 # token = os.environ.get('SLACKTOKEN')
@@ -51,7 +57,7 @@ app.register_blueprint(from_api)
 # Routing for your application.
 ###
 
-@app.route('/demo')
+@app.route('/')
 def home():
     test = sc.api_call("api.test")
     channels = sc.api_call("channels.list", token=token)
@@ -64,7 +70,7 @@ def home():
     """Render website's home page."""
     return render_template('home.html', test=test, channels=channels, msglist='')
 
-@app.route('/')
+@app.route('/demo')
 def fronthome():
 
     return render_template('intro.html')
@@ -81,22 +87,44 @@ def getchannels():
 
 @app.route('/api/getcategories', methods=['GET', 'POST'])
 def getcategories():
-    print("Got categories")
+    print("Got categories/users")
     users = sc.api_call("users.list",token=token)
     # return jsonify({"list": "channels"})
     return jsonify(users)
 
 
-# @app.route('/api/getexploredata', methods=['GET', 'POST'])
-# def getexploredata():
-#     query = "start n=node(*) MATCH (nodes)--> (user:User {value:" + request.data + "}) RETURN user, nodes"
-#     result = gdb.query(q=query,data_contents=True)
-#     print("Got explorer data", request.data, result)
-#     print("DIR", dir(result))
-#     # print result.graph
-#     # graph = result.graph
-#     # return jsonify({"list": "channels"})
-#     return result
+@app.route('/api/batchprocess', methods=['GET', 'POST'])
+def dailybatch():
+
+    # Get list of channels
+    channellist = sc.api_call("channels.list", token=token)
+
+    # Check last processed time
+    for achannel in channellist:
+        createEntity(channels,achannel,channelidx,)
+        msglist = sc.api_call("channels.history", token=token, channel=achannel.id)
+
+        # For each channel run create node/rel process while process greater than channel time
+        processMessages(msglist=msglist,lasttime=0)
+
+
+    allnodequery = "MATCH (node:User) RETURN node"
+    numnodesquery = "MATCH (node) "
+    numrelsquery = ""
+    betweenessquery = ""
+    nummessagesquery = ""
+    params = {}
+    querySquenceObject = gdb.query(allnodequery, params=params, returns=RAW)
+    for node in querySquenceObject:
+        n = node.pop()
+        uid = n.get('metadata').get('id')
+        data = n.get('data')
+        value = data.get('value')
+
+    # Get all user nodes
+    # Update stats for the nodes
+    # Find a way to run this daily
+    return
 
 @app.route('/api/getteaminfo', methods=['GET', 'POST'])
 def getteaminfo():
@@ -112,26 +140,42 @@ def foo(x=None, y=None):
     channels = sc.api_call("channels.list", token=token)
     msglist = sc.api_call("channels.history", token=token, channel=id)
     foundlinks = []
-    test = "TEST TEXT"
+    testtext = ""
+    keywords = []
     for msg in msglist['messages']:
         msgencode = unicodedata.normalize('NFKD', msg['text']).encode('ascii', 'ignore')
         userencode = unicodedata.normalize('NFKD', msg['user']).encode('ascii', 'ignore')
         # foundlinks.append(re.findall("<(.*?)>", msgencode))
-        # Parse msg for top 3 tags
+        # Parse msg for top 3 Tags
         # Check then Create Tag
         # Connect Message to Tag
-        # Connect User to Tag
-        createnodes(re.findall("<(.*?)>", msgencode), msg, userencode)
+        # Connect User to Ta
+        entities = re.findall("<(.*?)>", msgencode)
+        tagentities = re.findall("<.*?>", msgencode)
+
+        cleanmsg = removeent(msgencode, tagentities)
+        testtext = testtext + " " + cleanmsg.lower()
+        createnodes(entities, msgencode, userencode)
+        keywordray = parseTags(cleanmsg.lower())
+        keywordray.sort(key=len)
+        # print len(keywordray), cleanmsg, msgencode
+        if len(keywordray) > 2 and keywordray != []:
+            # print "inside if", keywordray
+            keywordray.reverse()
+            keywordray = keywordray[:2]
+        for tag in keywordray:
+            print "BOUTTA CREATE TAG", tag, keywordray
+            createrelationship(userencode,tag,"tag",msgencode)
+        keywords.append(keywordray)
+
+    test(testtext)
+    print "keywords" + str(keywords)
     return render_template('home.html', test=test, channels=channels, msglist='')
 
 def createnodes(entitieslist, msg, originuser):
 
     #remove entitieslist from ms
-    noentitymsg = removeent(msg['text'])
-
-    tags = parseTags(noentitymsg)
-    for tag in tags:
-        createrelationship(originuser, tag, "tag", msg)
+    # noentitymsg = removeent(msg['text'], entitieslist)
 
     for entity in entitieslist:
         if entity[:2] == "#C": # Channel
@@ -142,7 +186,7 @@ def createnodes(entitieslist, msg, originuser):
             createrelationship(originuser, entity, "user", msg)
         elif entity[:1] == "!": #Special?
             specials()
-        else: #Link
+        elif entity[:4] == "http": #Link
             # print "Link: " + entity
             createrelationship(originuser, entity, "link", msg)
 
@@ -152,20 +196,23 @@ def createnodes(entitieslist, msg, originuser):
 
 def createRelEnt(relationship,relationshipidx, reltype, end, origin):
 
-    interim = origin["value"].encode('ascii', 'ignore')
+    interim = end["value"].encode('ascii', 'ignore')
     rels = relationshipidx[reltype][interim]
-    print "Created Relationship: " + str(len(rels)) + ", " + reltype + ", Origin: " + origin['value'] + ", End: " + end['value']
+    print "Created Relationship: " + str(len(rels)) \
+          + ", (Origin: " + origin['value'] +  "), (" + reltype + "), (End: " + end['value'] +") interim: " + interim
+    # print "FROM TO" , origin, reltype, end
     if len(rels) > 0:
         objectnode = rels[0]
         id = objectnode.id
         returnrel = gdb.relationships[id]
         count = returnrel.get("count") + 1
-        print id, returnrel.get("count"), count
+        # print id, returnrel.get("count"), count
         returnrel.set("count", count)
+        print "rel count increase", returnrel.get('value')
     else:
         objectrel = relationship.create(reltype, end, value=end["value"].encode('ascii', 'ignore'), count=1)
         relationshipidx[reltype][interim] = objectrel
-
+        print "new rel:", interim, objectrel
     return
 
 
@@ -188,31 +235,34 @@ def createEntity(type, object, idx, idxtext):
         returnnode = gdb.node[id]
         count = returnnode.get("count") + 1
         returnnode.set("count", count)
+        print "node count increase", object
     else:
         objectnode = type.create(value=object, count=1, type=idxtext, img=img, date="JULY 26, 2016")
         idx[idxtext][objectnode["value"]] = objectnode
+        print "new node:", objectnode["value"]
 
     return objectnode
 
 
-def createrelationship(originuser, object, nodetype, msg):
+def createrelationship(originuser, object, nodetype, msgtext):
     # type: (str, str, str, str) -> none
-    msgtext = unicodedata.normalize('NFKD', msg['text']).encode('ascii', 'ignore')
+    # msgtext = unicodedata.normalize('NFKD', msg['text']).encode('ascii', 'ignore')
     idname = object.split('|', 1)
     # print idname
 
+    print nodetype, object
     if nodetype == 'channel':
 
         ch = createEntity(channels, object, channelidx, "channels")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "by", user, msg)
-        createRelEnt(msg.relationships, includesidx, "includes", ch, msg)
-        createRelEnt(user.relationships, mentionsidx, "mentions", ch, user)
+        createRelEnt(msg.relationships, Byidx, "By", user, msg)
+        createRelEnt(msg.relationships, Includesidx, "Includes", ch, msg)
+        createRelEnt(user.relationships, Mentionsidx, "Mentions", ch, user)
 
-        # msg.relationships.create("by", user, count=1)
-        # msg.relationships.create("includes", ch, count=1)
-        # user.relationships.create("mentions", ch, count=1)
+        # msg.relationships.create("By", user, count=1)
+        # msg.relationships.create("Includes", ch, count=1)
+        # user.relationships.create("Mentions", ch, count=1)
         # channelidx["channels"][ch["value"]] = ch
         # useridx["users"][user["value"]] = user
         # messageidx["messages"][msg["value"]] = msg
@@ -225,33 +275,30 @@ def createrelationship(originuser, object, nodetype, msg):
         entuser = createEntity(users, use, useridx, "users")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "by", user, msg)
-        createRelEnt(msg.relationships, includesidx, "includes", entuser, msg)
-        createRelEnt(user.relationships, mentionsidx, "mentions", entuser, user)
+        createRelEnt(msg.relationships, Byidx, "By", user, msg)
+        createRelEnt(msg.relationships, Includesidx, "Includes", entuser, msg)
+        if user != entuser:
+            createRelEnt(user.relationships, Mentionsidx, "Mentions", entuser, user)
 
     elif nodetype == 'link':
         lnk = createEntity(links, object, linkidx, "links")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "by", user, msg)
-        createRelEnt(msg.relationships, includesidx, "includes", lnk, msg)
-        createRelEnt(user.relationships, mentionsidx, "mentions", lnk, msg)
+        createRelEnt(msg.relationships, Byidx, "By", user, msg)
+        createRelEnt(msg.relationships, Includesidx, "Includes", lnk, msg)
+        createRelEnt(user.relationships, Mentionsidx, "Mentions", lnk, user)
 
     elif nodetype == 'tag':
-        tag = createEntity(tags, object, tagsidx,"tags")
+        tag = createEntity(Tags, object, Tagsidx,"Tags")
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, includesidx, "includes", tag, msg)
-        createRelEnt(user.relationships, mentionsidx, "mentions", tag, msg)
-        createRelEnt(msg.relationships, byidx, "by", user, msg)
-
-
-
-
+        createRelEnt(msg.relationships, Includesidx, "Includes", tag, msg)
+        createRelEnt(user.relationships, Mentionsidx, "Mentions", tag, user)
+        createRelEnt(msg.relationships, Byidx, "By", user, msg)
     else:
         msg = createEntity(messages, msgtext, messageidx, "messages")
         user = createEntity(users, originuser, useridx, "users")
-        createRelEnt(msg.relationships, byidx, "by", user, msg)
+        createRelEnt(msg.relationships, Byidx, "By", user, msg)
 
     return
 
@@ -263,12 +310,56 @@ def createGraphStats():
     graphstats = []
     return graphstats
 
+
 def parseTags(msg):
-    tags = []
-    return tags
-def removeent(msg):
-    msg = ""
-    return msg
+    tagged_msg = pos_tag(msg.split())
+    BAD_CHARS = ":.!?,\'\""
+    allnouns = [word.strip(BAD_CHARS) for word, pos in tagged_msg if (pos == 'NNP' or pos == 'NN') and len(word) > 2]
+    return allnouns
+
+
+def processMessages(msglist, lasttime):
+    for msg in msglist['messages']:
+        print msg['ts']
+        if msg['ts'] < lasttime:
+            break
+        else:
+
+            msgencode = unicodedata.normalize('NFKD', msg['text']).encode('ascii', 'ignore')
+            msgdate = unicodedata.normalize('NFKD', msg['ts']).encode('ascii', 'ignore')
+            userencode = unicodedata.normalize('NFKD', msg['user']).encode('ascii', 'ignore')
+
+            entities = re.findall("<(.*?)>", msgencode)
+            tagentities = re.findall("<.*?>", msgencode)
+
+            cleanmsg = removeent(msgencode, tagentities)
+            keywordray = parseTags(cleanmsg.lower())
+            keywordray.sort(key=len)
+
+            # processes for entities and msgs
+            createnodes(entities, msgencode, userencode)
+
+            # print len(keywordray), cleanmsg, msgencode
+            if len(keywordray) > 2 and keywordray != []:
+                # print "inside if", keywordray
+                # sort from big to small
+                keywordray.reverse()
+                # only use two tags per message
+                keywordray = keywordray[:2]
+            for tag in keywordray:
+                print "BOUTTA CREATE TAG", tag, keywordray
+                createrelationship(userencode, tag, "tag", msgencode)
+
+    return
+
+def removeent(msg, entities):
+    query = msg
+    stopwords = entities
+    querywords = query.split()
+    resultwords = [word for word in querywords if word not in stopwords]
+    result = ' '.join(resultwords)
+    # print "entities: ", str(entities), "querywords: ", str(querywords) + " result: " + result
+    return result
 
 
 
@@ -309,6 +400,83 @@ def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
 
+def isPunct(word):
+    return len(word) == 1 and word in string.punctuation
+
+
+def isNumeric(word):
+    try:
+        float(word) if '.' in word else int(word)
+        return True
+    except ValueError:
+        return False
+
+
+class RakeKeywordExtractor:
+    def __init__(self):
+        self.stopwords = set(nltk.corpus.stopwords.words())
+        self.top_fraction = 1  # consider top third candidate keywords By score
+
+    def _generate_candidate_keywords(self, sentences):
+        phrase_list = []
+        for sentence in sentences:
+            words = map(lambda x: "|" if x in self.stopwords else x,
+                        nltk.word_tokenize(sentence.lower()))
+            phrase = []
+            for word in words:
+                if word == "|" or isPunct(word):
+                    if len(phrase) > 0:
+                        phrase_list.append(phrase)
+                        phrase = []
+                else:
+                    phrase.append(word)
+        return phrase_list
+
+    def _calculate_word_scores(self, phrase_list):
+        word_freq = nltk.FreqDist()
+        word_degree = nltk.FreqDist()
+        for phrase in phrase_list:
+            degree = len(filter(lambda x: not isNumeric(x), phrase)) - 1
+            for word in phrase:
+                word_freq[word] += 1
+                word_degree[word, degree] += 1  # other words
+        for word in word_freq.keys():
+            word_degree[word] = word_degree[word] + word_freq[word]  # itself
+        # word score = deg(w) / freq(w)
+        word_scores = {}
+        for word in word_freq.keys():
+            word_scores[word] = word_degree[word] / word_freq[word]
+        return word_scores
+
+    def _calculate_phrase_scores(self, phrase_list, word_scores):
+        phrase_scores = {}
+        for phrase in phrase_list:
+            phrase_score = 0
+            for word in phrase:
+                phrase_score += word_scores[word]
+            phrase_scores[" ".join(phrase)] = phrase_score
+        return phrase_scores
+
+    def extract(self, text, incl_scores=False):
+        sentences = nltk.sent_tokenize(text)
+        phrase_list = self._generate_candidate_keywords(sentences)
+        word_scores = self._calculate_word_scores(phrase_list)
+        phrase_scores = self._calculate_phrase_scores(
+            phrase_list, word_scores)
+        sorted_phrase_scores = sorted(phrase_scores.iteritems(),
+                                      key=operator.itemgetter(1), reverse=True)
+        n_phrases = len(sorted_phrase_scores)
+        if incl_scores:
+            return sorted_phrase_scores[0:int(n_phrases / self.top_fraction)]
+        else:
+            return map(lambda x: x[0],
+                       sorted_phrase_scores[0:int(n_phrases / self.top_fraction)])
+
+
+def test(text):
+    rake = RakeKeywordExtractor()
+    keywords = rake.extract(text, incl_scores=True)
+    print keywords, len(keywords)
 
 if __name__ == '__main__':
     app.run(debug=True)

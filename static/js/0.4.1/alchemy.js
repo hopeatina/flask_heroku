@@ -165,7 +165,7 @@
                     a._edges[edge.id] = [aEdge];
                     return [aEdge];
                 } else if (edge.id && a._edges[edge.id]) {
-                    return console.warn("An edge with that id " + someEdgeMap.id + " already exists.\nConsider using the @a.get.edge() method to \nretrieve the edge and then using the Edge methods.\nNote: id's are not required for edges.  Alchemy will create\nan unlimited number of edges for the same source and target node.\nSimply omit 'id' when creating the edge.");
+                    return console.warn("An edge with that id " + edge.id + " already exists.\nConsider using the @a.get.edge() method to \nretrieve the edge and then using the Edge methods.\nNote: id's are not required for edges.  Alchemy will create\nan unlimited number of edges for the same source and target node.\nSimply omit 'id' when creating the edge.");
                 } else {
                     edgeArray = a._edges["" + edge.source + "-" + edge.target];
                     if (edgeArray) {
@@ -2605,6 +2605,7 @@
                 this._edgeType = this._setEdgeType();
                 this._style = conf.edgeStyle[this._edgeType] != null ? _.merge(_.clone(conf.edgeStyle["all"]), conf.edgeStyle[this._edgeType]) : _.clone(conf.edgeStyle["all"]);
                 // console.log(this);
+                console.log(this.a._nodes, this._properties.source, this._properties.target);
                 this._d3 = _.merge({
                     'id': this.id,
                     'pos': this._index,

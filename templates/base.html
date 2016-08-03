@@ -52,10 +52,12 @@
         </div>
 
         <div class="panel panel-default" id="category">
-            <div class="panel-heading"><select ng-init="selectedChannel = typeOptions[0]" ng-model='boom' required
-                                               ng-options='option.value as option.name for option in typeOptions'>
-                <option value="">Explore By User</option>
-            </select></div>
+            <div class="panel-heading">
+                <select ng-init="selectedChannel = typeOptions[0]" ng-change="getUsers()" ng-model='catbool' required
+                        ng-options='option.value as option.name for option in typeOptions'>
+                    <option value="user">Explore By User</option>
+                </select>
+            </div>
             <div class="list-group internal-list">
                 <a ng-repeat="entity in currentEntities" ng-click="switchCatSelection(entity)"
                    class="list-group-item categorystyle">
@@ -94,7 +96,7 @@
 
             <div ng-show="connected" class="list-group internal-list-full">
                 <div ng-show="explorebool" class="fill-height">
-                    <a ng-show="graphstatebool" ng-repeat="entity in some_data.nodes" ng-click=""
+                    <a ng-show="graphstatebool" ng-repeat="entity in some_data.nodes | filter: msgFilter " ng-click=""
                        class="list-group-item">
                         <h4 class="list-group-item-heading">{{ entity.value | angular }}</h4>
                         {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
@@ -141,22 +143,21 @@
                         <div ng-if="!matchmade">Suggested Matches</div>
                         <div ng-if="!matchmade" ng-repeat="match in suggestedMatches">
                             <button ng-click="updateMatch(match)" class="btn btn-warning magicbutton">
-                                <img ng-src="{{ match.user1.img | angular }}"> + <img ng-src="{{ match.user2.img | angular }}">
+                                <img ng-src="{{ match.user1.img | angular }}"> + <img
+                                    ng-src="{{ match.user2.img | angular }}">
                             </button>
                         </div>
                     </div>
                     <div class="col-md-6 center-comparison fill-height">
                         <div class="score-row">
-                            <div class="col-md-4">23</div>
+                            <div class="col-md-4">{{ samplescore1 | angular }}</div>
                             <div class="col-md-4">Score</div>
-                            <div class="col-md-4">96</div>
+                            <div class="col-md-4">{{ samplescore2 | angular }}</div>
                         </div>
                         <div class="col-md-12">Tags</div>
-                        <div class="tags-row">
-                            <div class="col-md-12">
-                                <button ng-repeat="tag in userOne.tags" type="button"
-                                        class="btn btn-danger tag-button ">{{ tag | angular }}</button>
-                            </div>
+                        <div class="col-md-12 tags-row">
+                            <button ng-repeat="tag in sampletags" type="button"
+                                    class="btn btn-danger tag-button ">{{ tag | angular }}</button>
                         </div>
                     </div>
                     <div class="col-md-3 fill-height">
@@ -164,9 +165,6 @@
                             <a ng-repeat="entity in currentEntities" ng-click="updateUserTwo(entity)"
                                class="list-group-item categorystyle internal-list-small">
                                 <div class="row">
-{#                                    <div class="col-md-2">#}
-{#                                        <img ng-src="{{ entity.img | angular }}">#}
-{#                                    </div>#}
                                     <div class="col-md-12">
                                         <p class="list-group-item-heading">{{ entity.name | angular }} </p>
                                     </div>
@@ -176,16 +174,18 @@
                         </div>
                     </div>
                 </div>
-{#                <div ng-if="matchamade" class="col-md-12">#}
-{#                    <input ng-if="matchmade" class="form-control introText" placeholder="Username" type="text" ng-model="introText">#}
-{#                </div>#}
+                {#                <div ng-if="matchamade" class="col-md-12">#}
+                {#                    <input ng-if="matchmade" class="form-control introText" placeholder="Username" type="text" ng-model="introText">#}
+                {#                </div>#}
                 <div class="connect-row">
                     <div class="col-md-3"></div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 text-area">
                         <button ng-if="!matchmade" ng-click="switchConnectInner()" type="button"
                                 class="btn btn-success select-button" ng-class="selectDisabled">Select
                         </button>
-                        <textarea ng-if="matchmade" class=" introText" placeholder="Write your intro here. Make sure to include the strengths and opportunities for both users." rows="5" ng-model="introText"></textarea>
+                        <textarea ng-if="matchmade" class=" introText"
+                                  placeholder="Write your intro here. Make sure to include the strengths and opportunities for both users."
+                                  rows="5" ng-model="introText"></textarea>
                         <button ng-if="matchmade" ng-click="sendMatch()" type="button"
                                 class="btn btn-success select-button">Send
                         </button>
@@ -208,23 +208,36 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
-                            <input id="box1" type="checkbox"/>
-                            <label for="box1">User</label>
+                            <div>
+                                <input id="box1" type="checkbox"/>
+                                <label for="box1">User (green)</label>
+                            </div>
+{#                            <div>#}
+{#                                <svg height="50" width="50">#}
+{#                                    <circle cx="25" cy="25" r="10" stroke="white" stroke-width="3" fill="red"/>#}
+{#                                </svg>#}
+{#                            </div>#}
                         </div>
                         <div class="col-md-6 col-xs-6">
                             <input id="box2" type="checkbox"/>
-                            <label for="box2">Message</label>
+                            <label for="box2">Message (orange)</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <input id="box3" type="checkbox"/>
-                            <label for="box3">Link</label>
+                            <label for="box3">Link (blue)</label>
                         </div>
                         <div class="col-md-6 col-xs-6">
+
                             <input id="box4" type="checkbox"/>
-                            <label for="box4">Tags</label>
+                            <label for="box4">Tags (red)</label>
+                            {#                            <svg style="position: absolute;">#}
+                            {#                                <circle id="circle-260" r="10"#}
+                            {#                                        style="fill: rgb(210, 50, 45);stroke: rgb(211, 211, 211);stroke-width: 3.33333;"></circle>#}
+                            {#                            </svg>#}
                         </div>
+
                     </div>
                     <div class="">
                         <h3>Sort</h3>
@@ -253,15 +266,19 @@
         </div>
         <div class="panel panel-default within-short" style="background-color:rgba(0, 0, 0, 0.5);">
             <div class="panel-heading">More Info </div>
-            <div class="within-short">
-                <div>Created Date
-                    <div/>
-                    <div>Density</div>
-                    <div>Number of Nodes</div>
-                    <div>Number of Relationships</div>
-                    <div> Betweeness</div>
-                    <div>Msgs/Day</div>
-                </div>
+            <div class="within-short" style="text-align: left;">
+                <div class="col-md-6">Created Date</div>
+                <div class="col-md-6">July 10, 2016</div>
+                <div class="col-md-6">Density</div>
+                <div class="col-md-6">50/100</div>
+                <div class="col-md-6"># of Nodes</div>
+                <div class="col-md-6">10</div>
+                <div class="col-md-6"># of Relationships</div>
+                <div class="col-md-6">15</div>
+                <div class="col-md-6"> Betweeness</div>
+                <div class="col-md-6"> 189.5%</div>
+                <div class="col-md-6">Msgs/Day</div>
+                <div class="col-md-6">3.2</div>
             </div>
 
         </div>

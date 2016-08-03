@@ -48,9 +48,17 @@ function MyCtrl($scope, $http, $window) {
 
     $scope.matchmade = false;
     $scope.explorebool = false;
-    $scope.connected = false;
+    $scope.connected = true;
     $scope.userOneBool = false;
     $scope.userTwoBool = false;
+    $scope.samplescore1 = 24;
+    $scope.samplescore2 = 95;
+    $scope.sampletags = [
+        "Zika", "IBM", "Watson",
+        "Biotech", "Genetics", "Amurrica",
+        "SynBio", "Python", "Testing",
+        "DNA", "BioBreaks", "Life"
+    ];
     $scope.selectDisabled = "disabled";
     $scope.exploretext = "View Messages";
     $scope.explorecurrent = "Messages";
@@ -58,7 +66,7 @@ function MyCtrl($scope, $http, $window) {
         {img: "static/img/place_holderpic.png", name: "channel1"}
     ];
     $scope.typeOptions = [
-        {name: 'Explore by Topic', value: 'feature'}
+        {name: 'Explore by Tag', value: 'tags'}
         // {name: 'Explore by Intent', value: 'bug'},
         // {name: 'Explore by Type', value: 'enhancement'}
     ];
@@ -88,7 +96,7 @@ function MyCtrl($scope, $http, $window) {
     $scope.switchCatSelection = function (entity) {
         $scope.userOne = entity;
         $scope.userOneBool = true;
-        if (entity.id != -1 && $scope.connected)
+        if ($scope.connected)
             $scope.getGraphData(entity.id);
         else
             $scope.getUserOneData(entity.id);
@@ -108,6 +116,7 @@ function MyCtrl($scope, $http, $window) {
         }).then(function successCallback(response) {
             $scope.responseobject = response.data;
             $scope.channels = [];
+            console.log(response);
             // $scope.channels.push({img: "None", name: "All Channels"});
             response.data.channels.forEach(function (channelobj) {
                 $scope.channels.push({img: "None", name: channelobj.name});
@@ -118,13 +127,24 @@ function MyCtrl($scope, $http, $window) {
             console.log(response)
         });
     };
+    $scope.msgFilter = function (message) {
+        return message.type === "messages";
+    };
     $scope.getUsers = function () {
+
+        if ($scope.catbool == "user") {
+            var url ='/api/getcategories';
+            console.log($scope.catbool)
+        } else {
+            var url ='/api/gettags';
+
+        }
         $http({
             method: 'GET',
             url: '/api/getcategories'
         }).then(function successCallback(response) {
             $scope.responseobject = response.data;
-            $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: -1}];
+            $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
             console.log(response);
             // $scope.channels.push({img: "None", name: "All Channels"});
             var i;
@@ -160,6 +180,13 @@ function MyCtrl($scope, $http, $window) {
     };
     $scope.getGraphData = function (entityid) {
         $scope.graphstatebool = true;
+        $scope.userOne.score = 23;
+        $scope.userOne.tags = [
+            "Zika", "IBM", "Watson",
+            "Awesome", "Sauce", "Juice",
+            "Chicken", "Rice", "Fufu",
+            "Orange Soda", "Tech", "Life"
+        ];
         $http({
             url: '/api/getexploredata',
             method: "POST",
@@ -172,6 +199,7 @@ function MyCtrl($scope, $http, $window) {
 
             var nodes = $scope.alchemy.get.allNodes("all");
             var edges = $scope.alchemy.get.allEdges();
+
 
             $scope.alchemy.remove.nodes(nodes);
             $scope.alchemy.remove.edges(edges);
@@ -211,13 +239,14 @@ function MyCtrl($scope, $http, $window) {
             $scope.config = {
                 dataSource: $scope.some_data,
                 forceLocked: false,
+                directedEdges: true,
                 zoomControls: true,
                 initialScale: .8,
                 initialTranslate: [100, 100],
                 nodeTypes: {
                     "type": ["users",
                         "links",
-                        "messages", "channels", "tags"]
+                        "messages", "channels", "Tags"]
                 },
                 nodeStyle: {
                     "users": {
@@ -236,7 +265,7 @@ function MyCtrl($scope, $http, $window) {
                         color: "#ffffff",
                         borderColor: "#D3D3D3"
                     },
-                    "tags": {
+                    "Tags": {
                         color: "#d2322d",
                         borderColor: "#D3D3D3"
                     }
@@ -270,20 +299,25 @@ function MyCtrl($scope, $http, $window) {
         $scope.userTwoBool = true;
         $scope.userOneBool = true;
         $scope.selectDisabled = "";
+        $scope.samplescore1 = 23;
+        $scope.samplescore2 = 95;
+        $scope.sampletags = [
+        "Zika", "IBM", "Watson",
+        "Biotech", "Genetics", "Amurrica",
+        "SynBio", "Python", "Testing",
+        "DNA", "BioBreaks", "Life"];
     };
-    $scope.updateUserTwo = function(user2) {
+    $scope.updateUserTwo = function (user2) {
         $scope.userTwo = user2;
         $scope.userTwoBool = true;
         if (!$scope.userOneBool && !$scope.userTwoBool) {
             $scope.selectDisabled = "";
         }
     };
-    $scope.sendMatch = function() {
+    $scope.sendMatch = function () {
         $scope.switchConnectInner();
         $scope.introText = "";
     };
-
-
     $scope.testAPI();
     $scope.getUsers();
 
