@@ -66,6 +66,7 @@ function MyCtrl($scope, $http, $window) {
         {img: "static/img/place_holderpic.png", name: "channel1"}
     ];
     $scope.typeOptions = [
+        // {name: 'Explore by User', value: 'user'},
         {name: 'Explore by Tag', value: 'tags'}
         // {name: 'Explore by Intent', value: 'bug'},
         // {name: 'Explore by Type', value: 'enhancement'}
@@ -132,12 +133,11 @@ function MyCtrl($scope, $http, $window) {
     };
     $scope.getUsers = function () {
 
-        if ($scope.catbool == "user") {
+        if ($scope.catbool == "") {
             var url ='/api/getcategories';
             console.log($scope.catbool)
         } else {
             var url ='/api/gettags';
-
         }
         $http({
             method: 'GET',

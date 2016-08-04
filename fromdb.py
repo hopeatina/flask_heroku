@@ -187,7 +187,6 @@ def getNodes(db, query):
 def getRels(db, query):
     # q = "START n=node(*) MATCH (n)-[r]->() RETURN r"
     q = query
-    print q
     params = {}
     querySquenceObject = db.query(q, params=params, returns=RAW)
     # print "RELATIONS"
@@ -206,7 +205,6 @@ def getRels(db, query):
         end = r.get('end')
         value = r.get('type')
         # print(start, end, value )
-        print uid, start, value
         start = urlparse(start)
         end = urlparse(end)
 
