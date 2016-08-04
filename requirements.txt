@@ -19,3 +19,4 @@ slackclient
 virtualenv
 neo4jrestclient
 flask-triangle
+nltk
