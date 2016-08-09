@@ -42,7 +42,7 @@ def main(repeat, alpha):
         graphStats = updateGraphStats(updatedGraph)
         matches = suggestMatches(updatedGraph, graphStats)
         action = determineUtility(matches)
-        updateandReward = takeAction(action, updatedGraph, alpha)
+        updatedGraph, reward = takeAction(action, updatedGraph, alpha)
         repeat -= 1
 
     print updatedGraph.order(), updatedGraph.size(), updatedGraph.nodes(data=True)
@@ -100,14 +100,22 @@ def updateStats(nodes):
 
 # update the networknx.degree_centrality(g) stats
 def updateGraphStats(graph):
+    radius = 0
+    diameter = 0
+    center = []
+    if nx.is_connected(graph):
+        radius = nx.radius(graph)
+        diameter = nx.diameter(graph)
+        center = nx.center(graph)
+    else:
+        connectedcomp = nx.connected_components(graph)
 
     stats = {
-        "radius": nx.radius(graph),
-        "diameter": nx.diameter(graph),
-        "center": nx.center(graph),
+        "radius": radius,
+        "diameter": diameter,
+        "center": center,
         "avgcluscoeff": nx.average_clustering(graph),
         "nodeconnectivity": nx.node_connectivity(graph)
-
     }
 
     return stats
@@ -130,7 +138,12 @@ def suggestMatches(graph, graphstats):
 
 # Select match based on utility function
 def determineUtility(matches):
-    matches = []
+    options = [
+        ["remove", random.choice(matches)],
+        ["add", random.choice(matches)],
+        ["nothing", random.choice(matches)]
+    ]
+    matches = random.choice(options)
     return matches
 
 # Complete action
@@ -139,8 +152,17 @@ def determineUtility(matches):
 ### Increase node messages/connections
 ### Assign reward
 def takeAction(action, graph, alpha):
+    reward = 0
+    if action[0] == "remove":
+        graph.remove_node(action[1])
+        reward = -10
+    if action[0] == "add":
+        graph.add_edge(action[1])
+        reward = +5
+    if action[0] == "nothing":
+        reward = -2
 
-    return graph
+    return graph, reward
 
 
 # Add metrics to timeseries metric array

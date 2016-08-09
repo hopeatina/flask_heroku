@@ -19,8 +19,9 @@
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <link rel="stylesheet" href="../static/css/appmain.css">
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
-{#    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">#}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css"
+          integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
+    {#    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">#}
     <link rel="stylesheet/less" href="/static/css/main.less">
     <link rel="stylesheet" href="../static/js/0.4.1/styles/vendor.css">
     <link rel="stylesheet" href="../static/js/0.4.1/alchemy.css">
@@ -30,9 +31,15 @@
     <!-- Rather use `less.js` to dynamically compile your `stylesheet/less` files? -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
+            integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
+            integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
+            integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
+            crossorigin="anonymous"></script>
     <script> window.less || document.write('<script src="/static/js/less.js">\x3C/script>')</script>
 
 </head>
@@ -45,38 +52,91 @@
 
 <div ng-controller="HomeCtrl" class="container-fluid">
     <div class="row" style="height: 100px;">
-        <div class="col-xs-3 col-md-1">
+        <div class="col-xs-3 col-md-2">
             <img class="logo" src="/static/img/logo2.png">
         </div>
-        <div style="height: 100px;" class="col-xs-3 col-md-3 ">
-            <h1 class="titletext">Percey</h1>
+        <div style="height: 100px;" class="col-xs-3 col-md-4 ">
+            <h1 class="">Percey</h1>
+            <h4 class="" style="color: white">Connect with your community</h4>
         </div>
+
         <div class="col-xs-6 col-md-6 row">
             <h3 class="pull-left col-md-3 titletext adjust"><a href="/demo" class="demo"> Demo </a></h3>
             <a class="pull-left slackbutton adjust"
-               href=""><img
+               href="" data-toggle="modal" data-target="#myModal"><img
                     alt="Add to Slack" height="40" width="139"
                     src="https://platform.slack-edge.com/img/add_to_slack.png"
                     srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/></a>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Percey is currently in Beta</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Begin MailChimp Signup Form -->
+                        <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet"
+                              type="text/css">
+                        <style type="text/css">
+                            #mc_embed_signup {
+                                background: #fff;
+                                clear: left;
+                                font: 14px Helvetica, Arial, sans-serif;
+                                width: 100%;
+                            }
+
+                            /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+                               We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+                        </style>
+                        <div id="mc_embed_signup">
+                            <form action="//twitter.us13.list-manage.com/subscribe/post?u=c5fb4eed912743df87ea74021&amp;id=f9c5aa8704"
+                                  method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form"
+                                  class="validate" target="_blank" novalidate>
+                                <div id="mc_embed_signup_scroll">
+                                    <label for="mce-EMAIL">Join our beta</label>
+                                    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL"
+                                           placeholder="email address" required>
+                                    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input
+                                            type="text" name="b_c5fb4eed912743df87ea74021_f9c5aa8704" tabindex="-1"
+                                            value=""></div>
+                                    <div class="clear"><input  data-dismiss="modal" type="submit" value="Sign Up" name="subscribe"
+                                                              id="mc-embedded-subscribe" class="btn btn-primary"></div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!--End mc_embed_signup-->
+                    </div>
+{#                    <div class="modal-footer">#}
+{#                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>#}
+{#                        <button type="button"  class="btn btn-primary">Submit</button>#}
+{#                    </div>#}
+                </div>
+            </div>
         </div>
     </div>
     <div class="intro-section row">
         <div class="col-xs-1 col-md-1"></div>
         <div class="intro-div col-xs-10 col-md-10">
             <div class="col-xs-6 col-md-6 cover">
-                <h2>1. Understand your community</h2>
+                <h3>1. Understand your community</h3>
                 <img class="cover-image-top" src="/static/img/perceydash.PNG">
-                <div>
-                    <button class="btn btn-success center-button">Learn More</button>
-                </div>
+                {#                <div>#}
+                {#                    <button class="btn btn-success center-button">Learn More</button>#}
+                {#                </div>#}
             </div>
             <div class="col-xs-6 col-md-6 cover">
-                <h2>2. Create connections
-                </h2>
+                <h3>2. Create connections
+                </h3>
                 <img class="cover-image-shadow" src="/static/img/connect.png">
-                <div>
-                    <button class="btn btn-success center-button">Learn More</button>
-                </div>
+                {#                <div>#}
+                {#                    <button class="btn btn-success center-button">Learn More</button>#}
+                {#                </div>#}
             </div>
         </div>
         <div class=" col-xs-1 col-md-1"></div>
@@ -90,9 +150,9 @@
             </div>
             <div class="col-xs-4 col-md-4 cover">
                 <div style="margin-top: 30%">
-                <img class="cover-image-msg" src="/static/img/learning.png">
-                <h4>2. Percey Learns from Users</h4>
-                    </div>
+                    <img class="cover-image-msg" src="/static/img/learning.png">
+                    <h4>2. Percey Learns from Users</h4>
+                </div>
             </div>
             <div class="col-xs-4 col-md-4 cover">
                 <img class="cover-image" src="/static/img/nodestrans.png">
@@ -105,7 +165,7 @@
         <div class="col-xs-1 col-md-1"></div>
         <div class="features-div2 col-xs-10 col-md-10">
             <div class="col-xs-4 col-md-4 cover">
-                <img class="cover-image" src="/static/img/suggestedmatches.PNG">
+                <img class="matches" src="/static/img/suggestedmatches.PNG">
                 <h4>1. Select suggested Member match</h4>
             </div>
             <div class="col-xs-4 col-md-4 cover">
@@ -130,42 +190,49 @@
             </div>
             <div class="row">
 
-            <div class="col-xs-6 col-md-6">
-            <button type="button" ng-click="q1 = !q1" class="btn btn-info">What is Percey for?</button>
-            <button type="button" ng-click="q2 = !q2" class="btn btn-info">Is Percey a bot or an app? </button>
-            <button type="button" ng-click="q3 = !q3" class="btn btn-info">What are the main features?</button>
-            <button type="button" ng-click="q4 = !q4" class="btn btn-info">Are you going to make a stand-alone app?</button>
-            <button type="button" ng-click="q5 = !q5" class="btn btn-info">How do I get early access?</button>
-            <button type="button" ng-click="q6 = !q6" class="btn btn-info">Why is it called Percey?</button>
-            </div>
-            <div class="col-xs-6 col-md-6">
-            <div id="demo" ng-show="q1">
-
-                Percey helps you connect with your Slack commmunity. Percey provides valuable insight into your community's structure and the tools to improve the community's connections.
-            </div>
-            <div id="demo" ng-show="q2" >
-               Do you prefer food or water? Percey is a bot that learns from your community to categorize its knowledge. The web app serves as a dashboard for exploring and creating connections in your commmunity.
-            </div>
-            <div id="demo" ng-show="q3" >
-                Percey understands your community's structure and helps you improve it.
-            </div>
-
-            <div id="demo" ng-show="q4" >
-                Maybe. Reach out and tell us how you'd use it.
-            </div>
-            <div id="demo" ng-show="q5" >
-                <a class=""
-               href=""><img
-                    alt="Add to Slack" height="40" width="139"
-                    src="https://platform.slack-edge.com/img/add_to_slack.png"
-                    srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/></a>
-            </div>
-            <div id="demo" ng-show="q6" >
-                Percey changes your perception of the group. Rather than relying on vanity metrics and intuition, Percey quantitatively analyzes your networks while taking into
-                consideration qualitative measurements to suggest the best approach to improving your community.
-            </div>
+                <div class="col-xs-6 col-md-6">
+                    <button type="button" ng-click="q1 = !q1" class="btn btn-info">What is Percey for?</button>
+                    <br>
+                    <button type="button" ng-click="q2 = !q2" class="btn btn-info">Is Percey a bot or an app?</button>
+                    <br>
+                    <button type="button" ng-click="q3 = !q3" class="btn btn-info">What are the main features?</button>
+                    <br>
+                    <button type="button" ng-click="q4 = !q4" class="btn btn-info">Are you going to make a stand-alone
+                        app?
+                    </button>
+                    <br>
+                    <button type="button" ng-click="q5 = !q5" class="btn btn-info">How do I get early access?</button>
+                    <br>
+                    <button type="button" ng-click="q6 = !q6" class="btn btn-info">Why is it called Percey?</button>
                 </div>
+                <div class="col-xs-6 col-md-6">
+                    <div id="demo" ng-show="q1">
+
+                        Percey helps you connect with your Slack commmunity. Percey provides valuable insight into your community's structure and the tools to improve the community's connections.
+                    </div>
+                    <div id="demo" ng-show="q2">
+                        Do you prefer food or water? Percey is a bot that learns from your community to categorize its knowledge. The web app serves as a dashboard for exploring and creating connections in your commmunity.
+                    </div>
+                    <div id="demo" ng-show="q3">
+                        Percey understands your community's structure and helps you improve it.
+                    </div>
+
+                    <div id="demo" ng-show="q4">
+                        Maybe. Reach out and tell us how you'd use it.
+                    </div>
+                    <div id="demo" ng-show="q5">
+                        <a class=""
+                           href=""><img
+                                alt="Add to Slack" height="40" width="139"
+                                src="https://platform.slack-edge.com/img/add_to_slack.png"
+                                srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/></a>
+                    </div>
+                    <div id="demo" ng-show="q6">
+                        Percey changes your perception of the group. Rather than relying on vanity metrics and intuition, Percey quantitatively analyzes your networks while taking into
+                        consideration qualitative measurements to suggest the best approach to improving your community.
+                    </div>
                 </div>
+            </div>
         </div>
         <div class=" col-xs-1 col-md-1"></div>
     </div>
