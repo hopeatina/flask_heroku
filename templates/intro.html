@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <link rel="stylesheet" href="../static/css/appmain.css">
 
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
+{#    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">#}
     <link rel="stylesheet/less" href="/static/css/main.less">
     <link rel="stylesheet" href="../static/js/0.4.1/styles/vendor.css">
     <link rel="stylesheet" href="../static/js/0.4.1/alchemy.css">
@@ -29,6 +29,10 @@
 
     <!-- Rather use `less.js` to dynamically compile your `stylesheet/less` files? -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
     <script> window.less || document.write('<script src="/static/js/less.js">\x3C/script>')</script>
 
 </head>
@@ -47,8 +51,7 @@
         <div style="height: 100px;" class="col-xs-3 col-md-3 ">
             <h1 class="titletext">Percey</h1>
         </div>
-        <div style="height: 100px;" class="col-xs-1 col-md-4"></div>
-        <div class="col-xs-4 col-md-4 row">
+        <div class="col-xs-6 col-md-6 row">
             <h3 class="pull-left col-md-3 titletext adjust"><a href="/demo" class="demo"> Demo </a></h3>
             <a class="pull-left slackbutton adjust"
                href=""><img
@@ -60,14 +63,14 @@
     <div class="intro-section row">
         <div class="col-xs-1 col-md-1"></div>
         <div class="intro-div col-xs-10 col-md-10">
-            <div class="col-xs-10 col-md-6 cover">
+            <div class="col-xs-6 col-md-6 cover">
                 <h2>1. Understand your community</h2>
-                <img class="cover-image" src="/static/img/perceydash.PNG">
+                <img class="cover-image-top" src="/static/img/perceydash.PNG">
                 <div>
                     <button class="btn btn-success center-button">Learn More</button>
                 </div>
             </div>
-            <div class="col-xs-10 col-md-6 cover">
+            <div class="col-xs-6 col-md-6 cover">
                 <h2>2. Create connections
                 </h2>
                 <img class="cover-image-shadow" src="/static/img/connect.png">
@@ -81,16 +84,18 @@
     <div class="features-section row">
         <div class="col-xs-1 col-md-1"></div>
         <div class="features-div col-xs-10 col-md-10">
-            <div class="col-xs-10 col-md-4 cover ">
-                <img class="cover-image" src="/static/img/octocat.png">
+            <div class="col-xs-4 col-md-4 cover ">
+                <img class="cover-image" src="/static/img/process.png">
                 <h4>1. Percey processes message History and Real-time</h4>
             </div>
-            <div class="col-xs-10 col-md-4 cover">
-                <img class="cover-image" src="/static/img/octocat.png">
+            <div class="col-xs-4 col-md-4 cover">
+                <div style="margin-top: 30%">
+                <img class="cover-image-msg" src="/static/img/learning.png">
                 <h4>2. Percey Learns from Users</h4>
+                    </div>
             </div>
-            <div class="col-xs-10 col-md-4 cover">
-                <img class="cover-image" src="/static/img/octocat.png">
+            <div class="col-xs-4 col-md-4 cover">
+                <img class="cover-image" src="/static/img/nodestrans.png">
                 <h4>3. Builds Group Model To Explore</h4>
             </div>
         </div>
@@ -99,16 +104,16 @@
     <div class="features-section row">
         <div class="col-xs-1 col-md-1"></div>
         <div class="features-div2 col-xs-10 col-md-10">
-            <div class="col-xs-10 col-md-4 cover">
-                <img class="cover-image" src="/static/img/octocat.png">
+            <div class="col-xs-4 col-md-4 cover">
+                <img class="cover-image" src="/static/img/suggestedmatches.PNG">
                 <h4>1. Select suggested Member match</h4>
             </div>
-            <div class="col-xs-10 col-md-4 cover">
-                <img class="cover-image" src="/static/img/octocat.png">
+            <div class="col-xs-4 col-md-4 cover">
+                <img class="cover-image" src="/static/img/writeintro.PNG">
                 <h4>2. Write the intro</h4>
             </div>
-            <div class="col-xs-10 col-md-4 cover">
-                <img class="cover-image" src="/static/img/octocat.png">
+            <div class="col-xs-4 col-md-4 cover">
+                <img class="cover-image" src="/static/img/connected.png">
                 <h4>3. Percey connects them on your behalf</h4>
             </div>
 
@@ -123,32 +128,44 @@
                     <h2>FAQs</h2>
                 </div>
             </div>
+            <div class="row">
 
-            <button ng-click="q1 = !q1">Question 1</button>
-            <button ng-click="q2 = !q2">Question 2</button>
-            <button ng-click="q3 = !q3">Question 3</button>
-            <button ng-click="q4 = !q4">Question 4</button>
-            <button ng-click="q5 = !q5">Question 5</button>
-            <button ng-click="q6 = !q6">Question 6</button>
-            <div id="demo" ng-show="q1" >
-                Answer 1
+            <div class="col-xs-6 col-md-6">
+            <button type="button" ng-click="q1 = !q1" class="btn btn-info">What is Percey for?</button>
+            <button type="button" ng-click="q2 = !q2" class="btn btn-info">Is Percey a bot or an app? </button>
+            <button type="button" ng-click="q3 = !q3" class="btn btn-info">What are the main features?</button>
+            <button type="button" ng-click="q4 = !q4" class="btn btn-info">Are you going to make a stand-alone app?</button>
+            <button type="button" ng-click="q5 = !q5" class="btn btn-info">How do I get early access?</button>
+            <button type="button" ng-click="q6 = !q6" class="btn btn-info">Why is it called Percey?</button>
+            </div>
+            <div class="col-xs-6 col-md-6">
+            <div id="demo" ng-show="q1">
+
+                Percey helps you connect with your Slack commmunity. Percey provides valuable insight into your community's structure and the tools to improve the community's connections.
             </div>
             <div id="demo" ng-show="q2" >
-                Answer 2
+               Do you prefer food or water? Percey is a bot that learns from your community to categorize its knowledge. The web app serves as a dashboard for exploring and creating connections in your commmunity.
             </div>
             <div id="demo" ng-show="q3" >
-                Answer 3
+                Percey understands your community's structure and helps you improve it.
             </div>
 
             <div id="demo" ng-show="q4" >
-                Answer 4
+                Maybe. Reach out and tell us how you'd use it.
             </div>
             <div id="demo" ng-show="q5" >
-                Answer 5
+                <a class=""
+               href=""><img
+                    alt="Add to Slack" height="40" width="139"
+                    src="https://platform.slack-edge.com/img/add_to_slack.png"
+                    srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/></a>
             </div>
             <div id="demo" ng-show="q6" >
-                Answer 6
+                Percey changes your perception of the group. Rather than relying on vanity metrics and intuition, Percey quantitatively analyzes your networks while taking into
+                consideration qualitative measurements to suggest the best approach to improving your community.
             </div>
+                </div>
+                </div>
         </div>
         <div class=" col-xs-1 col-md-1"></div>
     </div>

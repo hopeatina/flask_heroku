@@ -63,7 +63,7 @@ body, html, .container-fluid {
 }
 
 .cover-image-shadow {
-    height: 50%;
+    width: 100%;
     /*opacity: 1 !important;*/
     box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 6px 0 rgba(0, 0, 0, 0.19);
 
@@ -71,6 +71,14 @@ body, html, .container-fluid {
 
 .cover-image {
     height: 50%;
+    /*opacity: 1 !important;*/
+}
+.cover-image-top {
+    width: 100%
+    /*opacity: 1 !important;*/
+}
+.cover-image-msg {
+    width: 100%;
     /*opacity: 1 !important;*/
 }
 

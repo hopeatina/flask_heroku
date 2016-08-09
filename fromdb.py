@@ -1,4 +1,3 @@
-
 from neo4jrestclient.client import GraphDatabase
 import os
 from neo4jrestclient.constants import RAW
@@ -9,6 +8,27 @@ from flask import jsonify, request, Blueprint
 
 from_api = Blueprint('from_api', __name__)
 gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+
+
+@from_api.route('/api/gettags', methods=['GET', 'POST'])
+def gettagslist():
+
+    tagsq = "MATCH (tags:Tag)-[r]-() RETURN tags, COUNT(r) ORDER BY COUNT(r) DESC LIMIT 30"
+    nodes = getNodes(gdb, tagsq)
+
+    finalnodes = []
+    finalrels = []
+
+    for node in nodes:
+        if node not in finalnodes:
+            finalnodes.append(node)
+
+    result = {
+        'nodes': finalnodes
+    }
+    print("Got tags")
+    # return jsonify({"list": "channels"})
+    return jsonify(result)
 
 
 @from_api.route('/api/getexploredata', methods=['GET', 'POST'])
@@ -116,6 +136,7 @@ def getIndividualNR():
 
     return result
 
+
 def createNodeJSON(value, uid, nodetype, img, date, name):
     JSONObject = {
         'id': uid,
@@ -128,7 +149,7 @@ def createNodeJSON(value, uid, nodetype, img, date, name):
     return JSONObject
 
 
-def createRelsJSON(startNode, endNode, value,uid):
+def createRelsJSON(startNode, endNode, value, uid):
     JSONObject = {
         'source': int(startNode),
         'target': int(endNode),
@@ -153,9 +174,9 @@ def getNodes(db, query):
     # print "NODES"
     # qgraph = querySquenceObject.graph
     # print qgraph
-        # for object in qgraph:
-        #     o = object.pop()
-        #     print object, o
+    # for object in qgraph:
+    #     o = object.pop()
+    #     print object, o
 
     # Blank list to hold the JSON
     nodeJSON = []
@@ -166,6 +187,7 @@ def getNodes(db, query):
         n = node.pop()
         uid = n.get('metadata').get('id')
         data = n.get('data')
+        # print vars(n), vars(data)
         name = data.get('name')
         description = data.get('description')
         value = data.get('value')
@@ -200,7 +222,7 @@ def getRels(db, query):
 
     for rel in querySquenceObject:
         r = rel.pop()
-        uid =  r.get('metadata').get('id')
+        uid = r.get('metadata').get('id')
         start = r.get('start')
         end = r.get('end')
         value = r.get('type')

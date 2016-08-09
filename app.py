@@ -17,6 +17,7 @@ from neo4jrestclient import client
 from flask.ext.triangle import Triangle
 import re
 from fromdb import from_api
+# from simulator import simulator
 import operator
 from nltk import pos_tag
 import nltk
@@ -52,6 +53,7 @@ Triangle(app)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
 app.register_blueprint(from_api)
+# app.register_blueprint(simulator)
 
 ###
 # Routing for your application.
@@ -91,7 +93,6 @@ def getcategories():
     users = sc.api_call("users.list",token=token)
     # return jsonify({"list": "channels"})
     return jsonify(users)
-
 
 @app.route('/api/batchprocess', methods=['GET', 'POST'])
 def dailybatch():

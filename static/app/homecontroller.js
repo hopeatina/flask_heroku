@@ -34,6 +34,7 @@ function HomeCtrl($scope, $window) {
 function MyCtrl($scope, $http, $window) {
 
 
+    $scope.catbool = ""
     $scope.some_data =
     {
         "nodes": [],
@@ -132,51 +133,90 @@ function MyCtrl($scope, $http, $window) {
         return message.type === "messages";
     };
     $scope.getUsers = function () {
-
+        var url = "";
         if ($scope.catbool == "") {
-            var url ='/api/getcategories';
-            console.log($scope.catbool)
-        } else {
-            var url ='/api/gettags';
-        }
-        $http({
-            method: 'GET',
-            url: '/api/getcategories'
-        }).then(function successCallback(response) {
-            $scope.responseobject = response.data;
-            $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
-            console.log(response);
-            // $scope.channels.push({img: "None", name: "All Channels"});
-            var i;
-            for (i = 0; i < 5; i++) {
-                var p1 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
-                var p2 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
-                console.log($scope.suggestedMatches);
-                $scope.suggestedMatches.push(
-                    {
-                        "user1": {
-                            "img": p1.profile.image_32,
-                            "name": p1.name,
-                            "id": p1.id
-                        },
-                        "user2": {
-                            "img": p2.profile.image_32,
-                            "name": p2.name,
-                            "id": p2.id
-                        }
-                    });
-            }
+            url = '/api/getcategories';
+            console.log($scope.catbool);
+            $http({
+                method: 'GET',
+                url: '/api/getcategories'
+            }).then(function successCallback(response) {
+                $scope.responseobject = response.data;
+                $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
+                console.log(response);
+                // $scope.channels.push({img: "None", name: "All Channels"});
+                var i;
+                $scope.suggestedMatches = [];
+                for (i = 0; i < 5; i++) {
+                    var p1 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
+                    var p2 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
+                    $scope.suggestedMatches.push(
+                        {
+                            "user1": {
+                                "img": p1.profile.image_32,
+                                "name": p1.name,
+                                "id": p1.id
+                            },
+                            "user2": {
+                                "img": p2.profile.image_32,
+                                "name": p2.name,
+                                "id": p2.id
+                            }
+                        });
+                }
 
-            response.data.members.forEach(function (member) {
-                $scope.currentEntities.push({img: member.profile.image_32, name: member.name, id: member.id});
+                response.data.members.forEach(function (member) {
+                    $scope.currentEntities.push({img: member.profile.image_32, name: member.name, id: member.id});
 
+                });
+                console.log($scope.currentEntities)
+            }, function errorCallback(response) {
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+                console.log(response)
             });
-            console.log($scope.currentEntities)
-        }, function errorCallback(response) {
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
-            console.log(response)
-        });
+        } else if ($scope.catbool == "tags") {
+            url = '/api/gettags';
+            $http({
+                method: 'GET',
+                url: url
+            }).then(function successCallback(response) {
+                $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
+                console.log(response);
+                // $scope.channels.push({img: "None", name: "All Channels"});
+                var i;
+                $scope.suggestedMatches = [];
+                for (i = 0; i < 5; i++) {
+                    var p1 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
+                    var p2 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
+                    $scope.suggestedMatches.push(
+                        {
+                            "user1": {
+                                "img": p1.profile.image_32,
+                                "name": p1.name,
+                                "id": p1.id
+                            },
+                            "user2": {
+                                "img": p2.profile.image_32,
+                                "name": p2.name,
+                                "id": p2.id
+                            }
+                        });
+                }
+
+                response.data.nodes.forEach(function (tag) {
+                    $scope.currentEntities.push({img: "/static/img/place_holderpic.png", name: tag.value, id: tag.id});
+
+                });
+                console.log($scope.currentEntities)
+            }, function errorCallback(response) {
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+                console.log(response)
+            });
+        }
+        console.log($scope.catbool);
+
     };
     $scope.getGraphData = function (entityid) {
         $scope.graphstatebool = true;
@@ -302,10 +342,10 @@ function MyCtrl($scope, $http, $window) {
         $scope.samplescore1 = 23;
         $scope.samplescore2 = 95;
         $scope.sampletags = [
-        "Zika", "IBM", "Watson",
-        "Biotech", "Genetics", "Amurrica",
-        "SynBio", "Python", "Testing",
-        "DNA", "BioBreaks", "Life"];
+            "Zika", "IBM", "Watson",
+            "Biotech", "Genetics", "Amurrica",
+            "SynBio", "Python", "Testing",
+            "DNA", "BioBreaks", "Life"];
     };
     $scope.updateUserTwo = function (user2) {
         $scope.userTwo = user2;
