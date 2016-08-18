@@ -22,3 +22,4 @@ flask-triangle
 nltk
 networkx
 py2neo
+matplotlib

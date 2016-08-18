@@ -102,11 +102,13 @@
                         {#                    <p class="list-group-item-text">{{ entity.img | angular }}</p>#}
                     </a>
                     <div ng-hide="graphstatebool" class="empty">
-                        <img src="/static/img/logo2.png" style="height: 150px">
+                        <img  src="/static/img/logo2.png" style="height: 150px">
                         <h4> Hey There! Click on a member on the left to visualize their Connections.</h4>
                     </div>
-                    <!--{% block main %}-->
-                    <!--{% endblock %}-->
+                <div style="margin-top: 20%;">
+                    {% block main %}
+                    {% endblock %}
+                </div>
                 </div>
                 <div ng-hide="explorebool" class="fill-height">
                     <div ng-show="graphstatebool" class='alchemy' id='alchemy'></div>
