@@ -6,6 +6,7 @@ import random
 from datetime import datetime
 import pandas as pd
 from scipy import spatial
+import csv
 
 from flask import Blueprint
 
@@ -97,8 +98,6 @@ class GraphingAgent():
         print stats
         plt.show()
 
-        while True:
-            plt.pause(3)
         # for state in states:
         #     for action in self.allactions:
         #         transition = (state, action)
@@ -118,8 +117,7 @@ class GraphingAgent():
         time = datetime.now().strftime("%Y-%m-%d%H.%M")
         updatedGraph = None
 
-        while False:
-        # while repeat > 0:
+        while repeat > 0:
             # print "# of states", len(self.states), "Q: ", len(self.q), self.q
             # TODO: GET INPUTS, graphStats, matches
             if repeat == origin:
@@ -518,25 +516,73 @@ def experiment():
     modelAgent = GraphingAgent(random=False)
     randomAgent = GraphingAgent(random=True)
 
-    plt.figure()
-    modelAgent.main(90, 2, 5)  # Random is false
-    plt.figure()
-    randomAgent.main(90, 2, 5)  # Random is true
+
+    x = modelAgent.main(5, 2, 5)  # Random is false
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111)
+    # ax.xaxis.set_visible(False)
+    # ax.yaxis.set_visible(False)
+    # colLabels = ("Structure", "Energy", "Density")
+    vals = []
+    for a in x:
+        vals.append(range(len(x)))
+    # cols = [a for a in x]
+    # print cols, vals
+    # the_table = ax.table(cellText=vals,
+    #                      colLabels=cols, loc='center')
+
+    # plt.figure()
+    # y = randomAgent.main(90, 2, 5)  # Random is true
 
     repeatresults = {"Model": [], "Random": []}
-    growrateresults = []
-    matchrateresults = []
+    growrateresults = {"Model": [], "Random": []}
+    matchrateresults = {"Model": [], "Random": []}
 
-    # for i in range(repeatrange[0], repeatrange[1], repeatrange[2]):
-    #     repeatresults["Random"].append(randomAgent.main(i, 2, 5))
-    #     repeatresults["Model"].append(modelAgent.main(i, 2, 5))
-    #
-    # for i in range(growraterange[0], growraterange[1], growraterange[2]):
-    #     growrateresults["Random"].append(randomAgent.main(90, i, 5))
-    #     growrateresults["Model"].append(modelAgent.main(90, i, 5))
-    #
-    # for i in range(matchraterange[0], growraterange[1], growraterange[2]):
-    #     matchrateresults["Random"].append(randomAgent.main(90, 2, i))
-    #     matchrateresults["Model"].append(modelAgent.main(90, 2, i))
+    rand = []
+    model = []
+
+    for i in range(repeatrange[0], repeatrange[1], repeatrange[2]):
+        ra = randomAgent.main(i, 2, 5)
+        mo = modelAgent.main(i, 2, 5)
+        for a in ra:
+            rand.append(ra[a])
+        for o in mo:
+            model.append(mo[o])
+        repeatresults["Random"].append(rand)
+        repeatresults["Model"].append(model)
+
+    rand = []
+    model = []
+    for i in range(growraterange[0], growraterange[1], growraterange[2]):
+        ra = randomAgent.main(90, i, 5)
+        mo = modelAgent.main(90, i, 5)
+        for a in ra:
+            rand.append(ra[a])
+        for o in mo:
+            model.append(mo[o])
+        growrateresults["Random"].append(rand)
+        growrateresults["Model"].append(model)
+
+    rand = []
+    model = []
+    for i in range(matchraterange[0], growraterange[1], growraterange[2]):
+        ra = randomAgent.main(90, 2, i)
+        mo = modelAgent.main(90, 2, i)
+        for a in ra:
+            rand.append(ra[a])
+        for o in mo:
+            model.append(mo[o])
+        matchrateresults["Random"].append(rand)
+        matchrateresults["Model"].append(model)
+
+    with open("graphStats.csv", "wb") as f:
+        writer = csv.writer(f)
+        writer.writerows(repeatresults)
+        writer.writerows(growrateresults)
+        writer.writerows(matchrateresults)
+
+    while True:
+        plt.pause(3)
+
 
 experiment()
