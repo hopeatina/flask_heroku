@@ -1,30 +1,17 @@
 import networkx as nx
-from neo4jrestclient.client import GraphDatabase
 import os
-from neo4jrestclient.constants import RAW
-from urlparse import urlparse
 from py2neo import Graph
-import re
-from pandas import DataFrame
 import matplotlib.pyplot as plt
 import random
 from datetime import datetime
 import pandas as pd
 from scipy import spatial
-import collections
 
-from flask import jsonify, request, Blueprint
+from flask import Blueprint
 
 simulator = Blueprint('simulator', __name__)
 # gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 py2neograph = Graph(os.environ.get("GRAPHENEDB_URL"))
-
-
-# main function
-### Input Parameters:
-### repeat = # of iterations/days
-### alpha = growth rate of group, added members per day
-###
 
 @simulator.route('/api/runModel', methods=['GET', 'POST'])
 class GraphingAgent():
@@ -104,7 +91,14 @@ class GraphingAgent():
 
         # TODO: Initialize variables
         counter = 0
+        initgraph = nx.Graph(procNodes)
+        nx.draw(initgraph)
+        stats = self.updateGraphStats(initgraph)
+        print stats
+        plt.show()
 
+        while True:
+            plt.pause(3)
         # for state in states:
         #     for action in self.allactions:
         #         transition = (state, action)
@@ -124,7 +118,8 @@ class GraphingAgent():
         time = datetime.now().strftime("%Y-%m-%d%H.%M")
         updatedGraph = None
 
-        while repeat > 0:
+        while False:
+        # while repeat > 0:
             # print "# of states", len(self.states), "Q: ", len(self.q), self.q
             # TODO: GET INPUTS, graphStats, matches
             if repeat == origin:
@@ -141,19 +136,19 @@ class GraphingAgent():
             graphStats = self.normalizeStats(graphStats)
             temp = graphStats
             if self.old_graph_Stats != None:
-                # for attribute in graphStats:
-                #     if graphStats[attribute] > self.old_graph_Stats[attribute]:
-                #         graphStats[attribute] = 1
-                #     if graphStats[attribute] < self.old_graph_Stats[attribute]:
-                #         graphStats[attribute] = -1
-                #     if graphStats[attribute] == self.old_graph_Stats[attribute]:
-                #         graphStats[attribute] = 0
-                #     print "compare", attribute, graphStats[attribute], self.old_graph_Stats[attribute], graphStats[attribute]
-                self.state = (graphStats)
+                for attribute in graphStats:
+                    if graphStats[attribute] > self.old_graph_Stats[attribute]:
+                        graphStats[attribute] = 1
+                    if graphStats[attribute] < self.old_graph_Stats[attribute]:
+                        graphStats[attribute] = -1
+                    if graphStats[attribute] == self.old_graph_Stats[attribute]:
+                        graphStats[attribute] = 0
+                    print "compare", attribute, graphStats[attribute], self.old_graph_Stats[attribute], graphStats[attribute]
+                self.state = (graphStats, self.old_action)
             else:
                 for attribute in graphStats:
                     graphStats[attribute] = 0
-                self.state =(graphStats)
+                self.state =(graphStats, self.old_action)
 
             if self.state not in self.states and self.state != None:
                 self.states.append(self.state)
@@ -253,11 +248,11 @@ class GraphingAgent():
         plt.show()
 
         plt.pause(3)
-        #
+
         # print updatedGraph.order(), updatedGraph.size(), updatedGraph.nodes(data=True)
         # print graphStats
 
-        return []
+        return self.old_graph_Stats
 
     def addandConnect(self, graph, startnum, growrate):
         addednodes = []
@@ -434,7 +429,6 @@ class GraphingAgent():
                 break
 
         # Check if nodes have high degree amongst tags
-
         sorted_matchray = sorted(matchray.items(), key=lambda x: x[1]['degree'])
         # print "inside matchnodes", len(allnodes),  sorted_matchray
         if len(sorted_matchray) > 0:
@@ -498,7 +492,6 @@ class GraphingAgent():
         print "took actions", actionpairs, reward
         return graph, reward
 
-
 class User():
     def __init__(self, id):
         self.id = id
@@ -519,15 +512,31 @@ class User():
 
 def experiment():
     repeatrange = (1, 90, 10)
-    growraterange = (1,10,1)
-    matchraterange = (1,10,1)
+    growraterange = (1, 10, 1)
+    matchraterange = (1, 10, 1)
 
-theAgent = GraphingAgent(random=False)
-theAgentTwo = GraphingAgent(random=True)
-# repeat, growrate, matchrate
-plt.figure()
-theAgent.main(90, 2, 3) # Random is false
-plt.figure()
-theAgentTwo.main(90, 2, 3) # Random is true
-while True:
-    plt.pause(.5)
+    modelAgent = GraphingAgent(random=False)
+    randomAgent = GraphingAgent(random=True)
+
+    plt.figure()
+    modelAgent.main(90, 2, 5)  # Random is false
+    plt.figure()
+    randomAgent.main(90, 2, 5)  # Random is true
+
+    repeatresults = {"Model": [], "Random": []}
+    growrateresults = []
+    matchrateresults = []
+
+    # for i in range(repeatrange[0], repeatrange[1], repeatrange[2]):
+    #     repeatresults["Random"].append(randomAgent.main(i, 2, 5))
+    #     repeatresults["Model"].append(modelAgent.main(i, 2, 5))
+    #
+    # for i in range(growraterange[0], growraterange[1], growraterange[2]):
+    #     growrateresults["Random"].append(randomAgent.main(90, i, 5))
+    #     growrateresults["Model"].append(modelAgent.main(90, i, 5))
+    #
+    # for i in range(matchraterange[0], growraterange[1], growraterange[2]):
+    #     matchrateresults["Random"].append(randomAgent.main(90, 2, i))
+    #     matchrateresults["Model"].append(modelAgent.main(90, 2, i))
+
+experiment()
