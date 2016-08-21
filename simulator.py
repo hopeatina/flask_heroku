@@ -68,7 +68,7 @@ class GraphingAgent():
             "graphStats": fromDBgraphstats
         }
         dbGraph = nx.Graph(processFromDB)
-        print len(dbGraph.nodes()), nodestatsDB
+        # print len(dbGraph.nodes()), nodestatsDB
         x = pd.DataFrame(dBStats)
         x.to_csv("intialnodedata.csv")
         x.to_json("initialdatajson.json")
@@ -93,10 +93,10 @@ class GraphingAgent():
         # TODO: Initialize variables
         counter = 0
         initgraph = nx.Graph(procNodes)
-        nx.draw(initgraph)
+        # nx.draw(initgraph)
         stats = self.updateGraphStats(initgraph)
-        print stats
-        plt.show()
+        # print stats
+        # plt.show()
 
         # for state in states:
         #     for action in self.allactions:
@@ -134,14 +134,14 @@ class GraphingAgent():
             graphStats = self.normalizeStats(graphStats)
             temp = graphStats
             if self.old_graph_Stats != None:
-                for attribute in graphStats:
-                    if graphStats[attribute] > self.old_graph_Stats[attribute]:
-                        graphStats[attribute] = 1
-                    if graphStats[attribute] < self.old_graph_Stats[attribute]:
-                        graphStats[attribute] = -1
-                    if graphStats[attribute] == self.old_graph_Stats[attribute]:
-                        graphStats[attribute] = 0
-                    print "compare", attribute, graphStats[attribute], self.old_graph_Stats[attribute], graphStats[attribute]
+                # for attribute in graphStats:
+                #     if graphStats[attribute] > self.old_graph_Stats[attribute]:
+                #         graphStats[attribute] = 1
+                #     if graphStats[attribute] < self.old_graph_Stats[attribute]:
+                #         graphStats[attribute] = -1
+                #     if graphStats[attribute] == self.old_graph_Stats[attribute]:
+                #         graphStats[attribute] = 0
+                    # print "compare", attribute, graphStats[attribute], self.old_graph_Stats[attribute], graphStats[attribute]
                 self.state = (graphStats, self.old_action)
             else:
                 for attribute in graphStats:
@@ -193,18 +193,13 @@ class GraphingAgent():
             # Plot and stuff and save it to the file for gif creation later --- UNDO BELOW
             nx.draw(updatedGraph, with_labels=True, font_color='w')
             plt.show()
-            # pop = savestring + time + str(origin - repeat) + ".png"
-            # plt.savefig(pop)
-            # plt.pause(.05)
+            pop = savestring + time + str(origin - repeat) + ".png"
+            plt.savefig(pop)
+            plt.pause(3)
             if repeat != 0:
                 plt.clf()            # Plot and stuff and save it to the file for gif creation later --- UNDO BELOW
-            # nx.draw(updatedGraph, with_labels=True, font_color='w')
-            # plt.show()
-            # # pop = savestring + time + str(origin - repeat) + ".png"
-            # # plt.savefig(pop)
-            # plt.pause(1)
-            # plt.clf()
-        plt.figure()
+
+        # plt.figure()
         # print self.saveGraphStats
         ax = plt.subplot(321)
         ax.set_title("Avg Path Length")
@@ -218,26 +213,14 @@ class GraphingAgent():
         ax.plot(self.saveGraphStats['iter'], self.saveGraphStats['reward'], 'bo')
         ax = plt.subplot(324)
         ax.set_title("Clustering Components")
-        # degree_sequence = sorted([d for n, d in enumerate(nx.degree(updatedGraph))], reverse=True)  # degree sequence
-        # # print "Degree sequence", degree_sequence
-        # degreeCount = collections.Counter(degree_sequence)
-        # deg, cnt = zip(*degreeCount.items())
-        # print deg
-        # print cnt
-        # ax.plot(deg, cnt, color='b')
         d = nx.degree(updatedGraph)
         ax.hist(d.values())
-
-        # ax.plot(self.saveGraphStats['iter'], self.saveGraphStats['components'], 'yo')
         ax = plt.subplot(325)
         ax.set_title("Centrality")
-        # print "END GRAPH: ", [i for i in range(len(updatedGraph.nodes()))],
         centralrray = []
         boom = nx.get_node_attributes(updatedGraph, 'stats')
         for x in boom:
             centralrray.append(boom[x]['centrality'])
-        #     print x, boom[x]
-        # print "centrallry: ", centralrray
         ax.plot([i for i in range(len(centralrray))], centralrray, 'mo')
         ax = plt.subplot(326)
         title = "Number of Nodes +" + str(growrate)
@@ -245,7 +228,8 @@ class GraphingAgent():
         ax.plot(self.saveGraphStats['iter'], self.saveGraphStats['nodecount'], 'co')
         plt.show()
 
-        plt.pause(3)
+        while True:
+            plt.pause(3)
 
         # print updatedGraph.order(), updatedGraph.size(), updatedGraph.nodes(data=True)
         # print graphStats
@@ -309,7 +293,7 @@ class GraphingAgent():
             graph = oldgraph
         centralities = nx.degree_centrality(graph)
         betweenness = nx.betweenness_centrality(graph)
-        eigenvectors = nx.eigenvector_centrality(graph)
+        eigenvectors = nx.betweenness_centrality(graph)
         closenesscentrality = nx.closeness_centrality(graph)
         degrees = nx.degree(graph)
         for key, node in enumerate(graph.nodes()):
@@ -432,7 +416,7 @@ class GraphingAgent():
         if len(sorted_matchray) > 0:
             matchnode = random.sample(sorted_matchray[:5], 1)[0]
             # matchnode= sorted_matchray[0]
-            print "matchnode+ray" , matchnode, sorted_matchray
+            # print "matchnode+ray" , matchnode, sorted_matchray
         inray = [matchnode[0]]
         # print "length of sorted matchray", len(sorted_matchray)
         # randomly connect if not already connected
@@ -449,7 +433,7 @@ class GraphingAgent():
 
             allactions = [action for action, q in self.q[stateindex].iteritems()
                           if q == max(self.q[stateindex].values())]
-            print "chose action", state, self.q, self.q[stateindex], max(self.q[stateindex].values()), allactions
+            # print "chose action", state, self.q, self.q[stateindex], max(self.q[stateindex].values()), allactions
 
             # for action, q in self.q[stateindex].iteritems():
             #     print action, q
@@ -487,13 +471,13 @@ class GraphingAgent():
 
         reward = reward - len(specpairs)*10
 
-        print "took actions", actionpairs, reward
+        # print "took actions", actionpairs, reward
         return graph, reward
 
 class User():
     def __init__(self, id):
         self.id = id
-        self.tags = self.selectTags([1, 2, 3,4,5,6,7,8,9,10])
+        self.tags = self.selectTags([1, 2,3,4,5,6,7,8,9,10])
         self.msgrate = random.random()
         self.probability = .5
         self.updateUser()
@@ -509,80 +493,90 @@ class User():
 
 
 def experiment():
-    repeatrange = (1, 90, 10)
-    growraterange = (1, 10, 1)
-    matchraterange = (1, 10, 1)
+    repeatrange = (2, 21, 2)
+    growraterange = (2, 10, 1)
+    matchraterange = (2, 10, 1)
 
     modelAgent = GraphingAgent(random=False)
     randomAgent = GraphingAgent(random=True)
 
-
-    x = modelAgent.main(5, 2, 5)  # Random is false
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # ax.xaxis.set_visible(False)
-    # ax.yaxis.set_visible(False)
-    # colLabels = ("Structure", "Energy", "Density")
-    vals = []
-    for a in x:
-        vals.append(range(len(x)))
-    # cols = [a for a in x]
-    # print cols, vals
-    # the_table = ax.table(cellText=vals,
-    #                      colLabels=cols, loc='center')
-
-    # plt.figure()
-    # y = randomAgent.main(90, 2, 5)  # Random is true
-
     repeatresults = {"Model": [], "Random": []}
     growrateresults = {"Model": [], "Random": []}
     matchrateresults = {"Model": [], "Random": []}
+    baserepeat = 20
+    basegrow = 2
+    basematch = 5
 
     rand = []
     model = []
-
+    ra = None
     for i in range(repeatrange[0], repeatrange[1], repeatrange[2]):
-        ra = randomAgent.main(i, 2, 5)
-        mo = modelAgent.main(i, 2, 5)
-        for a in ra:
-            rand.append(ra[a])
-        for o in mo:
-            model.append(mo[o])
-        repeatresults["Random"].append(rand)
-        repeatresults["Model"].append(model)
+        print i, "repeat random"
+        ra = randomAgent.main(i, basegrow, basematch)
+        print i, "repeat model"
+        mo = modelAgent.main(i, basegrow, basematch)
+        ra['model'] = "random"
+        ra['repeat'] = i
+        ra['growthrate'] = basegrow
+        ra['matchrate'] = basematch
+        mo['model'] = "model"
+        mo['repeat'] = i
+        mo['growthrate'] = basegrow
+        mo['matchrate'] = basematch
+        repeatresults["Random"].append(ra)
+        repeatresults["Model"].append(mo)
 
-    rand = []
-    model = []
+    keys = ra.keys()
+    print keys
+
     for i in range(growraterange[0], growraterange[1], growraterange[2]):
-        ra = randomAgent.main(90, i, 5)
-        mo = modelAgent.main(90, i, 5)
-        for a in ra:
-            rand.append(ra[a])
-        for o in mo:
-            model.append(mo[o])
-        growrateresults["Random"].append(rand)
-        growrateresults["Model"].append(model)
+        print i, "growrate random"
+        ra = randomAgent.main(10, i, basematch)
+        print i, "growrate model"
+        mo = modelAgent.main(10, i, basematch)
+        ra['model'] = "random"
+        ra['repeat'] = baserepeat
+        ra['growthrate'] = i
+        ra['matchrate'] = basematch
+        mo['model'] = "model"
+        mo['repeat'] = baserepeat
+        mo['growthrate'] = i
+        mo['matchrate'] = basematch
 
-    rand = []
-    model = []
-    for i in range(matchraterange[0], growraterange[1], growraterange[2]):
-        ra = randomAgent.main(90, 2, i)
-        mo = modelAgent.main(90, 2, i)
-        for a in ra:
-            rand.append(ra[a])
-        for o in mo:
-            model.append(mo[o])
-        matchrateresults["Random"].append(rand)
-        matchrateresults["Model"].append(model)
+        growrateresults["Random"].append(ra)
+        growrateresults["Model"].append(mo)
 
+    for i in range(matchraterange[0], matchraterange[1], matchraterange[2]):
+        print i, "matchrate random"
+        ra = randomAgent.main(10, 2, i)
+        print i, "matchrate model"
+        mo = modelAgent.main(10, 2, i)
+
+        ra['model'] = "random"
+        ra['repeat'] = baserepeat
+        ra['growthrate'] = basegrow
+        ra['matchrate'] = i
+        mo['model'] = "model"
+        mo['repeat'] = baserepeat
+        mo['growthrate'] = basegrow
+        mo['matchrate'] = i
+        matchrateresults["Random"].append(ra)
+        matchrateresults["Model"].append(mo)
+
+    print "writing to csv"
     with open("graphStats.csv", "wb") as f:
-        writer = csv.writer(f)
-        writer.writerows(repeatresults)
-        writer.writerows(growrateresults)
-        writer.writerows(matchrateresults)
+        writer = csv.DictWriter(f, keys)
+        writer.writeheader()
+        writer.writerows(repeatresults['Random'])
+        writer.writerows(repeatresults['Model'])
+        writer.writerows(growrateresults['Random'])
+        writer.writerows(growrateresults['Model'])
+        writer.writerows(matchrateresults['Random'])
+        writer.writerows(matchrateresults['Model'])
 
     while True:
         plt.pause(3)
 
-
-experiment()
+# experiment()
+modelAgent = GraphingAgent(random=False)
+modelAgent.main(40, 2, 5)
