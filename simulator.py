@@ -12,6 +12,7 @@ from flask import Blueprint
 
 simulator = Blueprint('simulator', __name__)
 # gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+
 py2neograph = Graph(os.environ.get("GRAPHENEDB_URL"))
 
 @simulator.route('/api/runModel', methods=['GET', 'POST'])
@@ -56,11 +57,16 @@ class GraphingAgent():
         # tagsq = " MATCH (x:User)-[*..2]-(y:Tag) RETURN id(x) as id, COLLECT(id(y)) as rels, count(y) as endcount LIMIT 5"
         # tagsq = " MATCH (x:User)-[*..2]-(y:User) RETURN id(x) as id, COLLECT(id(y)) as rels, count(y) as endcount LIMIT 5"
         # This is for the comparison data to current DB state
+        # Cypher query that gets the users in a graph and their connection
         graphq = " MATCH (x:User)-[*..2]-(y:User) MATCH (m:Message)-[]-(x:User) RETURN id(x) as id, COLLECT(id(y)) as rels, count(y) as endcount, count(m) as mcount LIMIT 20"
+
+        # Cyper query that gets the number of nodes in the graph
         nodecountq = "MATCH (x) RETURN count(x) as count LIMIT 1"
 
+        # Returned graph objects
         seqGraphObj, startCount = self.getNodesFromDB(graphq, nodecountq)
         processFromDB, nodestatsDB = self.processNodes(seqGraphObj)
+
         fromDBgraphstats = self.updateGraphStats(nx.Graph(processFromDB))
 
         dBStats = {
@@ -68,11 +74,13 @@ class GraphingAgent():
             "graphStats": fromDBgraphstats
         }
         dbGraph = nx.Graph(processFromDB)
-        # print len(dbGraph.nodes()), nodestatsDB
         x = pd.DataFrame(dBStats)
+
+        # Saves initial stats to a csv and json
         x.to_csv("intialnodedata.csv")
         x.to_json("initialdatajson.json")
 
+        # Uncomment to visualize the graph community from the BioBreaks graph database
         # nx.draw(dbGraph, with_labels=True, font_color='w')
         # plt.show()
 
@@ -92,11 +100,12 @@ class GraphingAgent():
 
         # TODO: Initialize variables
         counter = 0
-        initgraph = nx.Graph(procNodes)
+
+        # for the initial graph stats and visualization
+        # stats = self.updateGraphStats(initgraph)
         # nx.draw(initgraph)
-        stats = self.updateGraphStats(initgraph)
-        # print stats
         # plt.show()
+
 
         # for state in states:
         #     for action in self.allactions:
@@ -113,6 +122,7 @@ class GraphingAgent():
         #
         # print "super", transitionProb, rewards
 
+        # Useful for saving data
         savestring = "Figures/"
         time = datetime.now().strftime("%Y-%m-%d%H.%M")
         updatedGraph = None
@@ -120,20 +130,25 @@ class GraphingAgent():
         while repeat > 0:
             # print "# of states", len(self.states), "Q: ", len(self.q), self.q
             # TODO: GET INPUTS, graphStats, matches
+            #  update graph on repeat increase, except for initialization using procNodes
             if repeat == origin:
                 updatedGraph = self.updateStats(procNodes, [])
             else:
                 updatedGraph = self.updateStats([], updatedGraph)
 
+            # updates the graph statistics for the network
             graphStats = self.updateGraphStats(updatedGraph)
+            # creates new nodes based on the growrate
             updatedGraph, newnodes = self.addandConnect(updatedGraph,startnodenum,growrate)
 
+            # Returns the matches for new nodes and internal nodes
             matches, newmatches = self.suggestMatches(updatedGraph, graphStats, matchrate, newnodes)
 
             # TODO: UPDATE STATE
             graphStats = self.normalizeStats(graphStats)
             temp = graphStats
             if self.old_graph_Stats != None:
+                # UNCOMMENT THIS TO GET DISCRETIZED DATA
                 # for attribute in graphStats:
                 #     if graphStats[attribute] > self.old_graph_Stats[attribute]:
                 #         graphStats[attribute] = 1
