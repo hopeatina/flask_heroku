@@ -2,11 +2,13 @@ import networkx as nx
 import os
 from py2neo import Graph
 import matplotlib.pyplot as plt
+import matplotlib.patches
 import random
 from datetime import datetime
 import pandas as pd
 from scipy import spatial
 import csv
+import numpy as np
 
 from flask import Blueprint
 
@@ -14,6 +16,8 @@ simulator = Blueprint('simulator', __name__)
 # gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
 graphurl = "http://app52089542-qMnWmY:PTPE2ka4DyL8PxESRfuR@app52089542qmnwmy.sb05.stations.graphenedb.com:24789"
 py2neograph = Graph(graphurl)
+
+
 # py2neograph = Graph(os.environ.get("GRAPHENEDB_URL"))
 
 @simulator.route('/api/runModel', methods=['GET', 'POST'])
@@ -44,7 +48,7 @@ class GraphingAgent():
             "nodecount": []
         }
         self.random = random
-        self.alltags = [0,1,2,3,4,5,6,7,8,9]
+        self.alltags = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     def main(self, repeat, growrate, matchrate):
         # repeat = number of times to iterate throuhg // the number of days a moderator would work through
@@ -107,27 +111,12 @@ class GraphingAgent():
         # nx.draw(initgraph)
         # plt.show()
 
-
-        # for state in states:
-        #     for action in self.allactions:
-        #         transition = (state, action)
-        #         a = random.uniform(0, 1)
-        #         b = random.uniform(0, a)
-        #         c = 1 - a - b
-        #         probs = [a, b, c]
-        #         transitionProb[transition] =[]
-        #         rewards[transition] =[]
-        #         for key, restate in enumerate(states):
-        #             transitionProb[transition].append({restate: probs[key]})
-        #             rewards[transition].append({restate: probs[key] * 5})
-        #
-        # print "super", transitionProb, rewards
-
         # Useful for saving data
         savestring = "Figures/"
         time = datetime.now().strftime("%Y-%m-%d%H.%M")
         updatedGraph = None
 
+        # While we still have repetitions to go through
         while repeat > 0:
             # print "# of states", len(self.states), "Q: ", len(self.q), self.q
             # TODO: GET INPUTS, graphStats, matches
@@ -140,7 +129,7 @@ class GraphingAgent():
             # updates the graph statistics for the network
             graphStats = self.updateGraphStats(updatedGraph)
             # creates new nodes based on the growrate
-            updatedGraph, newnodes = self.addandConnect(updatedGraph,startnodenum,growrate)
+            updatedGraph, newnodes = self.addandConnect(updatedGraph, startnodenum, growrate)
 
             # Returns the matches for new nodes and internal nodes
             matches, newmatches = self.suggestMatches(updatedGraph, graphStats, matchrate, newnodes)
@@ -149,20 +138,20 @@ class GraphingAgent():
             graphStats = self.normalizeStats(graphStats)
             temp = graphStats
             if self.old_graph_Stats != None:
-                # UNCOMMENT THIS TO GET DISCRETIZED DATA
+                #### UNCOMMENT THIS TO GET DISCRETIZED DATA
                 # for attribute in graphStats:
                 #     if graphStats[attribute] > self.old_graph_Stats[attribute]:
-                #         graphStats[attribute] = 1
+                #         temp[attribute] = 1
                 #     if graphStats[attribute] < self.old_graph_Stats[attribute]:
-                #         graphStats[attribute] = -1
+                #         temp[attribute] = -1
                 #     if graphStats[attribute] == self.old_graph_Stats[attribute]:
-                #         graphStats[attribute] = 0
-                    # print "compare", attribute, graphStats[attribute], self.old_graph_Stats[attribute], graphStats[attribute]
-                self.state = (graphStats, self.old_action)
+                #         temp[attribute] = 0
+                # print "compare", attribute, graphStats[attribute], self.old_graph_Stats[attribute], graphStats[attribute]
+                self.state = (temp, self.old_action)
             else:
                 for attribute in graphStats:
                     graphStats[attribute] = 0
-                self.state =(graphStats, self.old_action)
+                self.state = (graphStats, self.old_action)
 
             if self.state not in self.states and self.state != None:
                 self.states.append(self.state)
@@ -184,13 +173,14 @@ class GraphingAgent():
             action = self.determineUtility(matches, self.state)
 
             # TODO: Execute action and get reward
-            updatedGraph, reward = self.takeAction(action, updatedGraph, growrate, newmatches)
+            updatedGraph, reward = self.takeAction(action, updatedGraph, newmatches)
 
             # TODO: Learn policy based on state, action, and reward.
 
             # Growth rate is applied
 
-            self.old_graph_Stats = temp
+            self.old_graph_Stats = graphStats
+            # print "oldgraphstats", self.old_graph_Stats
             for key, index in enumerate(self.saveGraphStats):
                 if index != 'iter' and index != 'reward':
                     self.saveGraphStats[index].append(self.old_graph_Stats[index])
@@ -211,11 +201,11 @@ class GraphingAgent():
             plt.show()
             pop = savestring + time + str(origin - repeat) + ".png"
             plt.savefig(pop)
-            plt.pause(3)
+            plt.pause(.1)
             if repeat != 0:
-                plt.clf()            # Plot and stuff and save it to the file for gif creation later --- UNDO BELOW
+                plt.clf()  # Plot and stuff and save it to the file for gif creation later --- UNDO BELOW
 
-        # plt.figure()
+        plt.figure()
         # print self.saveGraphStats
         ax = plt.subplot(321)
         ax.set_title("Avg Path Length")
@@ -244,8 +234,16 @@ class GraphingAgent():
         ax.plot(self.saveGraphStats['iter'], self.saveGraphStats['nodecount'], 'co')
         plt.show()
 
-        while True:
-            plt.pause(3)
+        plt.figure()
+        node_order = None
+        partitions = []
+        colors = []
+        adjacency_matrix = nx.to_numpy_matrix(updatedGraph, dtype=np.bool, nodelist=node_order)
+        plt.imshow(adjacency_matrix,
+                   cmap="Reds",
+                   interpolation="none")
+        plt.colorbar()
+        plt.title('Network Heatmap')
 
         # print updatedGraph.order(), updatedGraph.size(), updatedGraph.nodes(data=True)
         # print graphStats
@@ -255,7 +253,7 @@ class GraphingAgent():
     def addandConnect(self, graph, startnum, growrate):
         addednodes = []
         for i in range(startnum, startnum + growrate):
-            x = User(i)
+            x = User(i, self.random)
             graph.add_node(i, probability=x.probability, msgrate=x.msgrate, tags=x.tags)
             addednodes.append(i)
 
@@ -305,25 +303,43 @@ class GraphingAgent():
             nodes = graph.nodes()
             for it in nodes:
                 graph.node[it]['tags'] = random.sample(self.alltags, 3)
+                graph.node[it]['probability'] = np.random.power(1)
         else:
             graph = oldgraph
+
         centralities = nx.degree_centrality(graph)
         betweenness = nx.betweenness_centrality(graph)
         eigenvectors = nx.betweenness_centrality(graph)
         closenesscentrality = nx.closeness_centrality(graph)
         degrees = nx.degree(graph)
+        rgcentralities = self.checkzero(max(centralities.values()) - min(centralities.values()))
+        rgbetweeness = self.checkzero(max(betweenness.values()) - min(betweenness.values()))
+        rgeigenvectors = self.checkzero(max(eigenvectors.values()) - min(eigenvectors.values()))
+        rgclosesness = self.checkzero(max(closenesscentrality.values()) - min(closenesscentrality.values()))
+        rgdegrees = self.checkzero(max(degrees.values()) - min(degrees.values()))
+
+
+        # print "AVERAGES", rgbetweeness, rgcentralities, rgclosesness, rgdegrees, rgeigenvectors
         for key, node in enumerate(graph.nodes()):
             graph.node[node]['stats'] = {
-                "msg/day": key, "centrality": centralities[node],
-                "betweeness": betweenness[node],
-                "closeness": closenesscentrality[node],
-                "eigenvector": eigenvectors[node]}
-            graph.node[node]['probability'] = degrees[node]
+                "msg/day": key, "centrality": centralities[node] / rgcentralities,
+                "betweeness": betweenness[node] / rgbetweeness,
+                "closeness": closenesscentrality[node] / rgclosesness,
+                "eigenvector": eigenvectors[node] / rgeigenvectors,
+                "userscore": sum([centralities[node] / rgcentralities, betweenness[node] / rgbetweeness,
+                                 closenesscentrality[node] / rgclosesness, eigenvectors[node] / rgeigenvectors]),
+                "degree": degrees[node] / rgdegrees
+            }
             # graph.node[node['id']]
             # Tags,
         return graph
 
     # update the networknx.degree_centrality(g) stats
+    def checkzero(self, number):
+        if number == 0:
+            return 1
+        else:
+            return number
 
     def updateGraphStats(self, graph):
 
@@ -395,8 +411,10 @@ class GraphingAgent():
                     friend = random.sample(removenew, 1)
                 else:
                     friend = self.matchNode(node, graph, removenew)
+                # print graph.node[node]
+                specprob = graph.node[node]['probability'] + graph.node[friend[0]]['probability']
                 # print friend, node, removenew
-                newsuggs.append(("connect", (node, friend[0])))  # DOING THE MOST RIGHT HERE
+                newsuggs.append(("connect", (node, friend[0], specprob)))  # DOING THE MOST RIGHT HERE
 
         while matchrate > 0:
             a = random.sample(removenew, 1)
@@ -408,7 +426,8 @@ class GraphingAgent():
                 b = self.matchNode(a[0], graph, removenew)
                 if b == a:
                     b = random.sample(removenew, 1)
-            suggs.append((a[0], b[0]))
+            prob = graph.node[a[0]]['probability'] + graph.node[b[0]]['probability']
+            suggs.append((a[0], b[0], prob))
             matchrate -= 1
 
         # print "suggested matches", suggs, len(nodes)
@@ -422,12 +441,13 @@ class GraphingAgent():
         # Check if nodes have same tags
         for option, key in enumerate(allnodes):
             close = 1 - spatial.distance.cosine(graph.node[node]["tags"], graph.node[option]["tags"])
-            matchray[option] = {"spdist": close, "degree": graph.node[option]['probability']}
+            matchray[option] = {"spdist": close, "userscore": graph.node[option]['stats']['userscore']}
             if key > len(allnodes):
                 break
-
+        # print "MATCHRAYS", matchray
         # Check if nodes have high degree amongst tags
-        sorted_matchray = sorted(matchray.items(), key=lambda x: x[1]['degree'])
+        sorted_matchray = sorted(matchray.items(), key=lambda x: (x[1]['spdist'], x[1]['userscore']))
+        sorted_matchray.reverse()
         # print "inside matchnodes", len(allnodes),  sorted_matchray
         if len(sorted_matchray) > 0:
             matchnode = random.sample(sorted_matchray[:5], 1)[0]
@@ -446,14 +466,19 @@ class GraphingAgent():
 
         if state in self.states and random.random() > self.epsilon:
             stateindex = self.states.index(state)
-
+            # print "MAX", max(self.q[stateindex].values())
             allactions = [action for action, q in self.q[stateindex].iteritems()
                           if q == max(self.q[stateindex].values())]
             # print "chose action", state, self.q, self.q[stateindex], max(self.q[stateindex].values()), allactions
 
             # for action, q in self.q[stateindex].iteritems():
             #     print action, q
-        action = random.sample(allactions, 1)
+        # print "determining Utility", allactions, state
+        if self.random:
+            action = random.sample(allactions, 1)
+        else:
+            # action = ["connect"]
+            action = random.sample(allactions, 1)
         for match in matches:
             actionpairs.append((action[0], match))
 
@@ -465,18 +490,20 @@ class GraphingAgent():
     ### Add more members according to growth rate
     ### Increase node messages/connections
     ### Assign reward
-    def takeAction(self, actionpairs, graph, growthrate, specpairs):
+    def takeAction(self, actionpairs, graph, specpairs):
         reward = 0
         actionpairs = actionpairs + specpairs
 
         for action in actionpairs:
+            # print "chose action", action
             if action[0] == "removenode":
-                chose = random.sample(action[1], 1)
+                chose = random.sample(action[1][:1], 1)
                 if graph.has_node(chose):
                     graph.remove_node(chose)
                 reward += -10
             if action[0] == "connect":
-                graph.add_edge(action[1][0], action[1][1])
+                # print action
+                graph.add_edge(action[1][0], action[1][1], weight=action[1][2])
                 reward += +10
             if action[0] == "disconnect":
                 if graph.has_edge(action[1][0], action[1][1]):
@@ -485,27 +512,30 @@ class GraphingAgent():
             if action[0] == None:
                 reward += -1
 
-        reward = reward - len(specpairs)*10
+        reward = reward - len(specpairs) * 10
 
         # print "took actions", actionpairs, reward
         return graph, reward
 
+
 class User():
-    def __init__(self, id):
+    def __init__(self, id, random):
         self.id = id
-        self.tags = self.selectTags([1, 2,3,4,5,6,7,8,9,10])
-        self.msgrate = random.random()
+        self.tags = self.selectTags([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        self.msgrate = np.random.power(1)
         self.probability = .5
+        self.random = random
         self.updateUser()
 
     def selectTags(self, tagslist):
-
         selectedTags = random.sample(tagslist, 3)
-
         return selectedTags
 
     def updateUser(self):
-        self.probability = random.random()
+        if self.random:
+            self.probability = random.random()
+        else:
+            self.probability = np.random.power(1)
 
 
 def experiment():
@@ -596,3 +626,6 @@ def experiment():
 # experiment()
 modelAgent = GraphingAgent(random=False)
 modelAgent.main(40, 2, 5)
+
+while True:
+    plt.pause(3)
