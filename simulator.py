@@ -49,6 +49,7 @@ class GraphingAgent():
         }
         self.random = random
         self.alltags = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.qualitystats = {}
 
     def main(self, repeat, growrate, matchrate):
         # repeat = number of times to iterate throuhg // the number of days a moderator would work through
@@ -306,7 +307,7 @@ class GraphingAgent():
             start += 1
 
         return redata, stats
-
+    # update individual nodes stats
     def updateStats(self, firstnodes, oldgraph):
         # for each node update it's stats
         if firstnodes != []:
@@ -351,7 +352,7 @@ class GraphingAgent():
             return 1
         else:
             return number
-
+    # update full Graph Stats
     def updateGraphStats(self, graph):
 
         origgraph = graph
@@ -444,11 +445,16 @@ class GraphingAgent():
         # print "suggested matches", suggs, len(nodes)
         return suggs, newsuggs
 
+    def findNodeSimilarity(self, node_a, node_b,graph):
+        similarity = 0
+        close = 1 - spatial.distance.cosine(graph.node[node_a]["tags"], graph.node[node_b]["tags"])
+        userdifference = abs(graph.node[node_a]['stats']['userscore']-graph.node[node_b]['stats']['userscore'])
+        
+
     def matchNode(self, node, graph, removenew):
         matchnode = node
         matchray = {}
         allnodes = removenew
-
         # Check if nodes have same tags
         for option, key in enumerate(allnodes):
             close = 1 - spatial.distance.cosine(graph.node[node]["tags"], graph.node[option]["tags"])
@@ -498,7 +504,6 @@ class GraphingAgent():
 
     # Complete action
     ### Update graph matrix
-    ### Add more members according to growth rate
     ### Increase node messages/connections
     ### Assign reward
     def takeAction(self, actionpairs, graph, specpairs):
