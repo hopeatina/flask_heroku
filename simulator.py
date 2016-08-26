@@ -200,8 +200,8 @@ class GraphingAgent():
             nx.draw(updatedGraph, with_labels=True, font_color='w')
             plt.show()
             pop = savestring + time + str(origin - repeat) + ".png"
-            plt.savefig(pop)
-            plt.pause(.1)
+            # plt.savefig(pop)
+            plt.pause(.005)
             if repeat != 0:
                 plt.clf()  # Plot and stuff and save it to the file for gif creation later --- UNDO BELOW
 
@@ -218,8 +218,9 @@ class GraphingAgent():
         ax.set_title(rewardtext)
         ax.plot(self.saveGraphStats['iter'], self.saveGraphStats['reward'], 'bo')
         ax = plt.subplot(324)
-        ax.set_title("Clustering Components")
+        ax.set_title("Degree Distribution")
         d = nx.degree(updatedGraph)
+        print d
         ax.hist(d.values())
         ax = plt.subplot(325)
         ax.set_title("Centrality")
@@ -236,14 +237,24 @@ class GraphingAgent():
 
         plt.figure()
         node_order = None
-        partitions = []
-        colors = []
         adjacency_matrix = nx.to_numpy_matrix(updatedGraph, dtype=np.bool, nodelist=node_order)
         plt.imshow(adjacency_matrix,
                    cmap="Reds",
                    interpolation="none")
         plt.colorbar()
         plt.title('Network Heatmap')
+
+        plt.figure()
+        title = "Userscore vs. Number of Occurences " + len(updatedGraph.nodes())
+        plt.title(title)
+        nodestats = nx.get_node_attributes(updatedGraph, 'stats')
+        noderay = {}
+        for node in nodestats:
+            noderay[node] = nodestats[node]['userscore']
+        print noderay
+        plt.hist(noderay.values())
+        plt.show()
+
 
         # print updatedGraph.order(), updatedGraph.size(), updatedGraph.nodes(data=True)
         # print graphStats
@@ -625,7 +636,7 @@ def experiment():
 
 # experiment()
 modelAgent = GraphingAgent(random=False)
-modelAgent.main(40, 2, 5)
+modelAgent.main(90, 2, 5)
 
 while True:
     plt.pause(3)
