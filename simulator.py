@@ -48,7 +48,7 @@ class GraphingAgent():
             "nodecount": []
         }
         self.random = random
-        self.alltags = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.alltags = range(0, 100, 1)
         self.qualitystats = {}
 
     def main(self, repeat, growrate, matchrate):
@@ -69,7 +69,7 @@ class GraphingAgent():
         # Cyper query that gets the number of nodes in the graph
         nodecountq = "MATCH (x) RETURN count(x) as count LIMIT 1"
 
-        # Returned graph objects
+        # # Returned graph objects
         seqGraphObj, startCount = self.getNodesFromDB(graphq, nodecountq)
         processFromDB, nodestatsDB = self.processNodes(seqGraphObj)
 
@@ -79,12 +79,12 @@ class GraphingAgent():
             "nodeStats": nodestatsDB,
             "graphStats": fromDBgraphstats
         }
-        dbGraph = nx.Graph(processFromDB)
+        # dbGraph = nx.Graph(processFromDB)
         x = pd.DataFrame(dBStats)
 
-        # Saves initial stats to a csv and json
-        x.to_csv("intialnodedata.csv")
-        x.to_json("initialdatajson.json")
+        # # Saves initial stats to a csv and json
+        # x.to_csv("intialnodedata.csv")
+        # x.to_json("initialdatajson.json")
 
         # Uncomment to visualize the graph community from the BioBreaks graph database
         # nx.draw(dbGraph, with_labels=True, font_color='w')
@@ -196,7 +196,7 @@ class GraphingAgent():
             repeat -= 1
             counter += 1
 
-            # print len(updatedGraph.nodes()), counter, repeat
+            print len(updatedGraph.nodes()), counter, repeat
             # Plot and stuff and save it to the file for gif creation later --- UNDO BELOW
             nx.draw(updatedGraph, with_labels=True, font_color='w')
             plt.show()
@@ -221,7 +221,6 @@ class GraphingAgent():
         ax = plt.subplot(324)
         ax.set_title("Degree Distribution")
         d = nx.degree(updatedGraph)
-        print d
         ax.hist(d.values())
         ax = plt.subplot(325)
         ax.set_title("Centrality")
@@ -246,16 +245,14 @@ class GraphingAgent():
         plt.title('Network Heatmap')
 
         plt.figure()
-        title = "Userscore vs. Number of Occurences " + len(updatedGraph.nodes())
+        title = "User Match closeness, " + str(len(self.qualitystats)) + " matches, " + str(len(updatedGraph.nodes())) + " users"
         plt.title(title)
         nodestats = nx.get_node_attributes(updatedGraph, 'stats')
         noderay = {}
         for node in nodestats:
             noderay[node] = nodestats[node]['userscore']
-        print noderay
-        plt.hist(noderay.values())
+        plt.hist(self.qualitystats.values())
         plt.show()
-
 
         # print updatedGraph.order(), updatedGraph.size(), updatedGraph.nodes(data=True)
         # print graphStats
@@ -307,6 +304,7 @@ class GraphingAgent():
             start += 1
 
         return redata, stats
+
     # update individual nodes stats
     def updateStats(self, firstnodes, oldgraph):
         # for each node update it's stats
@@ -330,7 +328,6 @@ class GraphingAgent():
         rgclosesness = self.checkzero(max(closenesscentrality.values()) - min(closenesscentrality.values()))
         rgdegrees = self.checkzero(max(degrees.values()) - min(degrees.values()))
 
-
         # print "AVERAGES", rgbetweeness, rgcentralities, rgclosesness, rgdegrees, rgeigenvectors
         for key, node in enumerate(graph.nodes()):
             graph.node[node]['stats'] = {
@@ -339,7 +336,7 @@ class GraphingAgent():
                 "closeness": closenesscentrality[node] / rgclosesness,
                 "eigenvector": eigenvectors[node] / rgeigenvectors,
                 "userscore": sum([centralities[node] / rgcentralities, betweenness[node] / rgbetweeness,
-                                 closenesscentrality[node] / rgclosesness, eigenvectors[node] / rgeigenvectors]),
+                                  closenesscentrality[node] / rgclosesness, eigenvectors[node] / rgeigenvectors]),
                 "degree": degrees[node] / rgdegrees
             }
             # graph.node[node['id']]
@@ -352,6 +349,7 @@ class GraphingAgent():
             return 1
         else:
             return number
+
     # update full Graph Stats
     def updateGraphStats(self, graph):
 
@@ -445,11 +443,12 @@ class GraphingAgent():
         # print "suggested matches", suggs, len(nodes)
         return suggs, newsuggs
 
-    def findNodeSimilarity(self, node_a, node_b,graph):
-        similarity = 0
+    def findNodeSimilarity(self, node_a, node_b, graph):
         close = 1 - spatial.distance.cosine(graph.node[node_a]["tags"], graph.node[node_b]["tags"])
-        userdifference = abs(graph.node[node_a]['stats']['userscore']-graph.node[node_b]['stats']['userscore'])
-        
+        # userdifference = abs(graph.node[node_a]['stats']['userscore'] - graph.node[node_b]['stats']['userscore'])
+        qualitytext = str(node_a) + str(node_b)
+        self.qualitystats[qualitytext] = close
+        return
 
     def matchNode(self, node, graph, removenew):
         matchnode = node
@@ -520,6 +519,7 @@ class GraphingAgent():
             if action[0] == "connect":
                 # print action
                 graph.add_edge(action[1][0], action[1][1], weight=action[1][2])
+                self.findNodeSimilarity(action[1][0], action[1][1], graph)
                 reward += +10
             if action[0] == "disconnect":
                 if graph.has_edge(action[1][0], action[1][1]):
@@ -639,9 +639,10 @@ def experiment():
     while True:
         plt.pause(3)
 
+
 # experiment()
 modelAgent = GraphingAgent(random=False)
-modelAgent.main(90, 2, 5)
+modelAgent.main(40, 2, 5)
 
 while True:
     plt.pause(3)
