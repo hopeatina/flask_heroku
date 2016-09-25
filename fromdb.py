@@ -7,7 +7,10 @@ import re
 from flask import jsonify, request, Blueprint
 
 from_api = Blueprint('from_api', __name__)
-gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+# gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+graphurl = "http://app52089542-qMnWmY:PTPE2ka4DyL8PxESRfuR@app52089542qmnwmy.sb05.stations.graphenedb.com:24789"
+
+gdb = GraphDatabase(graphurl)
 
 
 @from_api.route('/api/gettags', methods=['GET', 'POST'])

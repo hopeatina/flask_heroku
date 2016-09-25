@@ -23,7 +23,10 @@ from nltk import pos_tag
 import nltk
 import string
 
-gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+# gdb = GraphDatabase(os.environ.get("GRAPHENEDB_URL"))
+graphurl = "http://app52089542-qMnWmY:PTPE2ka4DyL8PxESRfuR@app52089542qmnwmy.sb05.stations.graphenedb.com:24789"
+
+gdb = GraphDatabase(graphurl)
 users = gdb.labels.create("User")
 channels = gdb.labels.create("Channel")
 links = gdb.labels.create("Link")

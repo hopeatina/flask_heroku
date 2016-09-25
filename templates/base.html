@@ -120,6 +120,7 @@
                     <script src="../static/js/0.4.1/alchemy.js"></script>
                 </div>
             </div>
+
             <div ng-if="!connected" class="list-group internal-list-full connect">
                 <h3>Connect</h3>
                 <div class="connect-row">
@@ -129,11 +130,11 @@
                     </div>
                     <div class="col-xs-1 col-sm-1">
                         <img ng-if="!userOneBool" src="/static/img/place_holderpic.png">
-                        <img ng-src="{{ userOne.img | angular }}"></div>
+                        <img ng-src="{{ userOne.imglg | angular }}"></div>
                     <div class="col-xs-2 col-sm-2">with</div>
                     <div class="col-xs-1 col-sm-1">
                         <img ng-if="!userTwoBool" src="/static/img/place_holderpic.png">
-                        <img ng-src="{{ userTwo.img | angular }}">
+                        <img ng-src="{{ userTwo.imglg | angular }}">
                     </div>
                     <div class="col-xs-4 col-sm-4">
                         <div ng-if="!userTwoBool">Pick their match below</div>

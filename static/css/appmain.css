@@ -58,7 +58,6 @@ body, html, .container-fluid {
 
 .cover {
     text-align: center;
-    height: 100%;
     top: 10%;
 }
 
@@ -88,18 +87,15 @@ body, html, .container-fluid {
 }
 
 .intro-section {
-    height: 80%;
     margin-top: 2%;
 }
 
 .features-section {
-    height: 50%;
     margin-top: 2%;
     margin-bottom: 2%;
 }
 
 .faqs-section {
-    height: 70%;
     margin-top: 2%;
     margin-bottom: 2%;
 }
@@ -110,7 +106,7 @@ body, html, .container-fluid {
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
-    height: 100%;
+    padding: 5%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -120,7 +116,7 @@ body, html, .container-fluid {
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
-    height: 100%;
+    padding: 5%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -130,7 +126,7 @@ body, html, .container-fluid {
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
-    height: 100%;
+    padding: 5%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -237,7 +233,7 @@ body, html, .container-fluid {
     margin-top: 10%
 }
 .connect {
-    background-color: floralwhite;
+    background-color: ghostwhite;
     color: black;
 }
 .connect-row {

@@ -154,11 +154,13 @@ function MyCtrl($scope, $http, $window) {
                         {
                             "user1": {
                                 "img": p1.profile.image_32,
+                                "imglg": p1.profile.image_48,
                                 "name": p1.name,
                                 "id": p1.id
                             },
                             "user2": {
                                 "img": p2.profile.image_32,
+                                "imglg": p1.profile.image_48,
                                 "name": p2.name,
                                 "id": p2.id
                             }
