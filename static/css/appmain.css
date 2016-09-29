@@ -44,6 +44,10 @@ body, html, .container-fluid {
 }
 .demo {
     color: inherit;
+    width: 85px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 5px;
 }
 
 .titletext2 {
@@ -151,7 +155,8 @@ body, html, .container-fluid {
 
 .logo {
     height: 100px;
-    background: radial-gradient(#cedade 60%, #0092b3 90%);
+    /*background: radial-gradient(#cedade 60%, #0092b3 90%);*/
+    background: white;
     -webkit-border-radius: 50px;
     -moz-border-radius: 50px;
     border-radius: 50px;
