@@ -160,7 +160,7 @@ function MyCtrl($scope, $http, $window) {
                             },
                             "user2": {
                                 "img": p2.profile.image_32,
-                                "imglg": p1.profile.image_48,
+                                "imglg": p2.profile.image_48,
                                 "name": p2.name,
                                 "id": p2.id
                             }
@@ -168,7 +168,7 @@ function MyCtrl($scope, $http, $window) {
                 }
 
                 response.data.members.forEach(function (member) {
-                    $scope.currentEntities.push({img: member.profile.image_32, name: member.name, id: member.id});
+                    $scope.currentEntities.push({img: member.profile.image_32, imglg: member.profile.image_48, name: member.name, id: member.id});
 
                 });
                 console.log($scope.currentEntities)
@@ -336,6 +336,7 @@ function MyCtrl($scope, $http, $window) {
         ];
     };
     $scope.updateMatch = function (match) {
+        console.log(match);
         $scope.userOne = match.user1;
         $scope.userTwo = match.user2;
         $scope.userTwoBool = true;

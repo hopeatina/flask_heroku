@@ -122,7 +122,7 @@
             </div>
 
             <div ng-if="!connected" class="list-group internal-list-full connect">
-                <h3>Connect</h3>
+                <h3 class="connect-top">Connect</h3>
                 <div class="connect-row">
                     <div class="col-xs-4 col-sm-4">
                         <div ng-if="!userOneBool">Select a user to connect</div>
@@ -141,6 +141,7 @@
                         {{ userTwo.name | angular }}
                     </div>
                 </div>
+                {{ userTwo | angular  }}
                 <div class="comparison">
                     <div class="col-xs-3 col-sm-3 fill-height">
                         <div ng-if="!matchmade">Suggested Matches</div>
