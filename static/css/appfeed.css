@@ -1,0 +1,49 @@
+
+.title-card {
+    width: 180px;
+    margin: 0px;
+    /* float: left; */
+    position: relative;
+    margin: 10px;
+    background: gainsboro;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    margin-top: -25px;
+}
+
+.header {
+text-align: center;
+    padding-bottom: 75px;
+    background: floralwhite;
+}
+
+.constrainWidth {
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+.constrainWidth-content {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+.news-content {
+    background-color: aqua;
+}
+
+.title-overlay {
+overflow-x: scroll;
+    display: -webkit-box;
+    height: 170px;
+    top: -75px;
+    position: relative;
+}
+
+.header-titles {
+
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>{% block title %}percey.com{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    {#    <!-- Compiled and minified CSS -->#}
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">#}
+    {##}
+    {#    <!-- Compiled and minified JavaScript -->#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>#}
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script src="../static/app/homecontroller.js"></script>
+    <link rel="stylesheet" href="../static/css/appfeed.css">
+
+    {% block css %}{% endblock %}
+
+    <!-- Rather use `less.js` to dynamically compile your `stylesheet/less` files? -->
+
+</head>
+
+<body ng-app="myApp">
+<div ng-controller="FeedCtrl">
+    <div class="header constrainWidth">
+        <h1>
+            theFeed - BioBreaks
+            The best Biotech news
+        </h1>
+        <div class="header-titles">
+            <nav>
+                <a>
+                    Home
+                </a>
+                <a>
+                    About
+                </a>
+                <a>
+                    Contact
+                </a>
+            </nav>
+        </div>
+    </div>
+
+
+    <div class="title-overlay">
+        <div class="title-card" ng-click="switchContent(website)" ng-repeat="website in websites">
+            {{ website.title | angular }}
+        </div>
+    </div>
+    <div class="news-content constrainWidth-content">
+        {{ content | angular }}
+    </div>
+</div>
+
+</body>
+</html>

@@ -75,6 +75,19 @@ def home():
     """Render website's home page."""
     return render_template('home.html', test=test, channels=channels, msglist='')
 
+@app.route('/thefeed')
+def feedcrawler():
+    test = sc.api_call("api.test")
+    channels = sc.api_call("channels.list", token=token)
+    # print channels
+    logging.debug(channels)
+    # print sc.api_call(
+    #     "chat.postMessage", channel="#general", text="Hello from Python! :tada:",
+    #     username='pybot', icon_emoji=':robot_face:'
+    # )
+    """Render website's feed page"""
+    return render_template('feed.html')
+
 @app.route('/')
 def fronthome():
 

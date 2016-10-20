@@ -7,6 +7,7 @@ var myApp = angular.module('myApp', []);
 
 myApp.controller('MyCtrl', MyCtrl)
     .controller('HomeCtrl', HomeCtrl)
+    .controller('FeedCtrl', FeedCtrl)
     .directive("graphDirective", function () {
         return {
             template: ""
@@ -18,6 +19,27 @@ myApp.controller('MyCtrl', MyCtrl)
 
         return d3;
     });
+
+function FeedCtrl($scope, $http) {
+    $scope.websites = [
+        {title: "Top", content: "Top content"},
+        {title: "Genomeweb", content: "Genomeweb content"},
+        {title: "FierceBiotech", content: "FierceBiotech content"},
+        {title: "SynBioBeta", content: "SynBioBeta content"},
+        {title: "Labiotech", content: "Labiotech content"},
+        {title: "reddit", content: "reddit content"},
+        {title: "Xconomy", content: "Xconomy content"},
+        {title: "Twitter Lists", content: "Twitter Lists content"},
+        {title: "Biostars", content: "Biostars content"},
+        {title: "Google Scholar", content: "Google Scholar content"},
+        {title: "Suggest a Source", content: "Suggest a Source content"}
+    ];
+    $scope.content = $scope.websites[0].content;
+
+    $scope.switchContent = function(selected) {
+        $scope.content = selected.content
+    }
+}
 function HomeCtrl($scope, $window) {
     $scope.q1 = false;
     $scope.q2 = false;
@@ -27,7 +49,7 @@ function HomeCtrl($scope, $window) {
     $scope.q6 = false;
 
     $scope.switchFaq = function (q) {
-        console.log(q);
+        // console.log(q);
         q = q ? false : true;
     }
 }
@@ -84,7 +106,7 @@ function MyCtrl($scope, $http, $window) {
     $scope.graphstatebool = false;
 
     $scope.switchExplore = function () {
-        console.log($scope.connected);
+        // console.log($scope.connected);
         $scope.connected = true;
         $scope.explorebool = !$scope.explorebool;
         $scope.exploretext = $scope.explorebool ? "View Graph" : "View Messages";
@@ -93,7 +115,7 @@ function MyCtrl($scope, $http, $window) {
     };
     $scope.switchConnect = function () {
         $scope.connected = !$scope.connected;
-        console.log($scope.connected)
+        // console.log($scope.connected)
     };
     $scope.switchCatSelection = function (entity) {
         $scope.userOne = entity;
@@ -102,7 +124,7 @@ function MyCtrl($scope, $http, $window) {
             $scope.getGraphData(entity.id);
         else
             $scope.getUserOneData(entity.id);
-        console.log(entity);
+        // console.log(entity);
         if ($scope.userOneBool && $scope.userTwoBool) {
             $scope.selectDisabled = "";
         }
@@ -116,9 +138,9 @@ function MyCtrl($scope, $http, $window) {
             method: 'GET',
             url: '/api/getchannels'
         }).then(function successCallback(response) {
-            $scope.responseobject = response.data;
+            // $scope.responseobject = response.data;
             $scope.channels = [];
-            console.log(response);
+            // console.log(response);
             // $scope.channels.push({img: "None", name: "All Channels"});
             response.data.channels.forEach(function (channelobj) {
                 $scope.channels.push({img: "None", name: channelobj.name});
@@ -136,46 +158,29 @@ function MyCtrl($scope, $http, $window) {
         var url = "";
         if ($scope.catbool == "") {
             url = '/api/getcategories';
-            console.log($scope.catbool);
+            // console.log($scope.catbool);
             $http({
                 method: 'GET',
                 url: '/api/getcategories'
             }).then(function successCallback(response) {
-                $scope.responseobject = response.data;
+                // $scope.responseobject = response.data;
                 $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
-                console.log(response);
+                // console.log(response);
                 // $scope.channels.push({img: "None", name: "All Channels"});
-                var i;
+
                 $scope.suggestedMatches = [];
-                for (i = 0; i < 5; i++) {
-                    var p1 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
-                    var p2 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
-                    $scope.suggestedMatches.push(
-                        {
-                            "user1": {
-                                "img": p1.profile.image_32,
-                                "imglg": p1.profile.image_48,
-                                "name": p1.name,
-                                "id": p1.id
-                            },
-                            "user2": {
-                                "img": p2.profile.image_32,
-                                "imglg": p2.profile.image_48,
-                                "name": p2.name,
-                                "id": p2.id
-                            }
-                        });
-                }
+
+                getNewMatches($scope.responseobject);
 
                 response.data.members.forEach(function (member) {
                     $scope.currentEntities.push({img: member.profile.image_32, imglg: member.profile.image_48, name: member.name, id: member.id});
 
                 });
-                console.log($scope.currentEntities)
+                // console.log($scope.currentEntities)
             }, function errorCallback(response) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
-                console.log(response)
+                // console.log(response)
             });
         } else if ($scope.catbool == "tags") {
             url = '/api/gettags';
@@ -184,7 +189,7 @@ function MyCtrl($scope, $http, $window) {
                 url: url
             }).then(function successCallback(response) {
                 $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
-                console.log(response);
+                // console.log(response);
                 // $scope.channels.push({img: "None", name: "All Channels"});
                 var i;
                 $scope.suggestedMatches = [];
@@ -210,16 +215,39 @@ function MyCtrl($scope, $http, $window) {
                     $scope.currentEntities.push({img: "/static/img/place_holderpic.png", name: tag.value, id: tag.id});
 
                 });
-                console.log($scope.currentEntities)
+                // console.log($scope.currentEntities)
             }, function errorCallback(response) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
-                console.log(response)
+                // console.log(response)
             });
         }
-        console.log($scope.catbool);
+        // console.log($scope.catbool);
 
     };
+    function getNewMatches(availableUsers) {
+    var i;
+    for (i = 0; i < 5; i++) {
+        var p1 = availableUsers.members[Math.floor(Math.random() * availableUsers.members.length)];
+        var p2 = availableUsers.members[Math.floor(Math.random() * availableUsers.members.length)];
+        $scope.suggestedMatches.push(
+            {
+                "user1": {
+                    "img": p1.profile.image_32,
+                    "imglg": p1.profile.image_48,
+                    "name": p1.name,
+                    "id": p1.id
+                },
+                "user2": {
+                    "img": p2.profile.image_32,
+                    "imglg": p2.profile.image_48,
+                    "name": p2.name,
+                    "id": p2.id
+                }
+            });
+    }
+
+}
     $scope.getGraphData = function (entityid) {
         $scope.graphstatebool = true;
         $scope.userOne.score = 23;
@@ -277,7 +305,7 @@ function MyCtrl($scope, $http, $window) {
                 // }]
             }
             ;
-            console.log(data, "Got graph data");
+            // console.log(data, "Got graph data");
             $scope.config = {
                 dataSource: $scope.some_data,
                 forceLocked: false,
@@ -317,12 +345,12 @@ function MyCtrl($scope, $http, $window) {
             };
 
             $scope.alchemy = new $window.Alchemy($scope.config);
-            console.log($scope.alchemy, $window.Alchemy)
+            // console.log($scope.alchemy, $window.Alchemy)
 
         }, function errorCallback(response) {
             // called asynchronously if an error occurs
             // or server returns response with an error status.
-            console.log(response)
+            // console.log(response)
         });
 
     };
@@ -336,7 +364,7 @@ function MyCtrl($scope, $http, $window) {
         ];
     };
     $scope.updateMatch = function (match) {
-        console.log(match);
+        // console.log(match);
         $scope.userOne = match.user1;
         $scope.userTwo = match.user2;
         $scope.userTwoBool = true;
@@ -356,6 +384,7 @@ function MyCtrl($scope, $http, $window) {
         if (!$scope.userOneBool && !$scope.userTwoBool) {
             $scope.selectDisabled = "";
         }
+        getNewMatches($scope.responseobject)
     };
     $scope.sendMatch = function () {
         $scope.switchConnectInner();
@@ -366,3 +395,5 @@ function MyCtrl($scope, $http, $window) {
 
 
 }
+
+
