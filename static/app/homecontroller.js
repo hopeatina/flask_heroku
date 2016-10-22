@@ -13,6 +13,9 @@ myApp.controller('MyCtrl', MyCtrl)
             template: ""
         };
     })
+    .factory("FeedService", function ($http) {
+
+    })
     .factory("jsService", function () {
         // here goes the code of your js (d3 in my case)
         //now return the object of the service
@@ -34,11 +37,25 @@ function FeedCtrl($scope, $http) {
         {title: "Google Scholar", content: "Google Scholar content"},
         {title: "Suggest a Source", content: "Suggest a Source content"}
     ];
-    $scope.content = $scope.websites[0].content;
+    var faketitles = [
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title1", img: "image", link: "newslink"},{name: "title1", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title2", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "titl3e", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title4", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title5", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title6", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title7", img: "image", link: "newslink"} ] },
+        {title: 'fakeTitle', link: "link" , outlets: [{name: "title8", img: "image", link: "newslink"} ] }
+    ];
+    // $scope.content = $scope.websites[0].content;
+    $scope.content = faketitles;
 
     $scope.switchContent = function(selected) {
-        $scope.content = selected.content
+        var data = getRecentCrawl(selected.title);
+        $scope.content = faketitles;
     }
+
+
 }
 function HomeCtrl($scope, $window) {
     $scope.q1 = false;

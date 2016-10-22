@@ -43,8 +43,6 @@ Byidx = gdb.relationships.indexes.create("By")
 Includesidx = gdb.relationships.indexes.create("Includes")
 Mentionsidx = gdb.relationships.indexes.create("Mentions")
 
-
-
 # token = os.environ.get('SLACKTOKEN')
 token = 'xoxp-48970123489-48964881879-50048816096-fd79da89e6'
 
