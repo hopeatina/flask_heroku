@@ -111,14 +111,15 @@ all the considered types of systems and systems of mixed types.
 def returnbaseurl(requested):
     return {
         'Top': 'algorithm',
-        'Genomeweb': {
+        'FierceBiotech': {
             'baseurl': 'http://www.fiercebiotech.com',
-            'startpage': 'startpage',
+            'startpage': 'http://www.fiercebiotech.com/biotech',
             'nextpagefunc': 'caniputonehere?',
-            'titlexpath': 'title',
-            'linkxpath': 'link',
-            'nextbuttonxpath': 'nextbutton'},
-        'FierceBiotech': 2,
+            'titlexpath': '//h2[@class="field-content list-title"]/a/text()',
+            'linkxpath': '//h2[@class="field-content list-title"]/a',
+            'timesxpath': '//span[@class="field-content"]/time/text()',
+            'nextbuttonxpath': '//ul[@class="js-pager__items"]/li/a'},
+        'Genomeweb': 2,
         'SynBioBeta': 2,
         'Labiotech': 2,
         'Xconomy': 2,
@@ -138,8 +139,8 @@ def runCrawler(requestedsite):
                    'http://www.sciencemag.org/news/latest-news',
                    'http://www.nature.com/nature/archive/category.html?code=archive_news',
                    ]
-    baseurl = 'http://www.fiercebiotech.com'
-    page = requests.get('http://www.fiercebiotech.com/biotech')
+    baseurl = siteitems['baseurl']
+    page = requests.get(siteitems['startpage'])
     tree = html.fromstring(page.content)
     count = 3
     alltitles = {
@@ -151,12 +152,12 @@ def runCrawler(requestedsite):
     test()
     # This will create a list of buyers:
     while count > 0:
-        titles = tree.xpath('//h2[@class="field-content list-title"]/a/text()')
+        titles = tree.xpath(siteitems['titlexpath'])
         # This will create a list of prices
-        times = tree.xpath('//span[@class="field-content"]/time/text()')
-        links = tree.xpath('//h2[@class="field-content list-title"]/a')
+        times = tree.xpath(siteitems['timesxpath'])
+        links = tree.xpath(siteitems['linkxpath'])
 
-        nextbutton = tree.xpath('//ul[@class="js-pager__items"]/li/a')
+        nextbutton = tree.xpath(siteitems['nextbuttonxpath'])
         if len(nextbutton)> 1:
             nextpage = nextbutton[1].get('href')
         else:
