@@ -51,8 +51,18 @@ function FeedCtrl($scope, $http) {
     $scope.content = faketitles;
 
     $scope.switchContent = function(selected) {
-        var data = getRecentCrawl(selected.title);
-        $scope.content = faketitles;
+        // var data = getRecentCrawl(selected.title);
+        $http({
+            url: '/thenewsfeed',
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            data: JSON.stringify(selected.title)
+        }).then(function(response) {
+            console.log(response);
+            $scope.responseobject = response.data.objects;
+            $scope.content = $scope.responseobject;
+        });
+
     }
 
 
@@ -73,7 +83,7 @@ function HomeCtrl($scope, $window) {
 function MyCtrl($scope, $http, $window) {
 
 
-    $scope.catbool = ""
+    $scope.catbool = "";
     $scope.some_data =
     {
         "nodes": [],
@@ -178,7 +188,7 @@ function MyCtrl($scope, $http, $window) {
             // console.log($scope.catbool);
             $http({
                 method: 'GET',
-                url: '/api/getcategories'
+                url: url
             }).then(function successCallback(response) {
                 // $scope.responseobject = response.data;
                 $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
@@ -206,7 +216,7 @@ function MyCtrl($scope, $http, $window) {
                 url: url
             }).then(function successCallback(response) {
                 $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
-                // console.log(response);
+                console.log(response);
                 // $scope.channels.push({img: "None", name: "All Channels"});
                 var i;
                 $scope.suggestedMatches = [];

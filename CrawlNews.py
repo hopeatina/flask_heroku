@@ -15,11 +15,12 @@ crawlnews = Blueprint('crawlnews', __name__)
 @crawlnews.route('/thenewsfeed', methods=['GET', 'POST'])
 def newscrawler():
 
-    result = runCrawler()
+    requestedsite = request.json
+    result = runCrawler(requestedsite)
     # result[1].plot(100, cumulative=False)
     # boom = result[1]
 
-    return jsonify(result[0])
+    return jsonify(result)
 
 
 def isPunct(word):
@@ -32,7 +33,6 @@ def isNumeric(word):
         return True
     except ValueError:
         return False
-
 
 class RakeKeywordExtractor:
     def __init__(self):
@@ -94,7 +94,6 @@ class RakeKeywordExtractor:
             return map(lambda x: x[0],
                        sorted_phrase_scores[0:int(n_phrases / self.top_fraction)])
 
-
 def test():
     rake = RakeKeywordExtractor()
     keywords = rake.extract("""
@@ -107,9 +106,31 @@ systems are given. These criteria and the corresponding algorithms for
 constructing a minimal supporting set of solutions can be used in solving
 all the considered types of systems and systems of mixed types.
   """, incl_scores=True)
-    print keywords, len(keywords)
+    # print keywords, len(keywords)
 
-def runCrawler():
+def returnbaseurl(requested):
+    return {
+        'Top': 'algorithm',
+        'Genomeweb': {
+            'baseurl': 'http://www.fiercebiotech.com',
+            'startpage': 'startpage',
+            'nextpagefunc': 'caniputonehere?',
+            'titlexpath': 'title',
+            'linkxpath': 'link',
+            'nextbuttonxpath': 'nextbutton'},
+        'FierceBiotech': 2,
+        'SynBioBeta': 2,
+        'Labiotech': 2,
+        'Xconomy': 2,
+        'Twitter Lists': 2,
+        'Biostars': 2,
+        'Suggest a Source': 'algorithm'
+
+    }[requested]
+
+
+def runCrawler(requestedsite):
+    siteitems = returnbaseurl(requestedsite)
     baseurllist = ['http://www.fiercebiotech.com/',
                    'https://www.statnews.com/',
                    'http://www.scientificamerican.com/medical-biotech/',
@@ -117,29 +138,33 @@ def runCrawler():
                    'http://www.sciencemag.org/news/latest-news',
                    'http://www.nature.com/nature/archive/category.html?code=archive_news',
                    ]
-    baseurl = 'http://www.fiercebiotech.com/'
-    page = requests.get('http://www.fiercebiotech.com/biotech/r-d')
+    baseurl = 'http://www.fiercebiotech.com'
+    page = requests.get('http://www.fiercebiotech.com/biotech')
     tree = html.fromstring(page.content)
-    count = 10
+    count = 3
     alltitles = {
         "titles": [],
         "dates": []
     }
     nouns = []
+    titleobject = { "objects": []}
     test()
     # This will create a list of buyers:
     while count > 0:
         titles = tree.xpath('//h2[@class="field-content list-title"]/a/text()')
         # This will create a list of prices
         times = tree.xpath('//span[@class="field-content"]/time/text()')
+        links = tree.xpath('//h2[@class="field-content list-title"]/a')
+
         nextbutton = tree.xpath('//ul[@class="js-pager__items"]/li/a')
         if len(nextbutton)> 1:
             nextpage = nextbutton[1].get('href')
         else:
             nextpage = nextbutton[0].get('href')
-        print len(nextbutton)
+
         page = requests.get(baseurl + nextpage)
         tree = html.fromstring(page.content)
+        print len(nextbutton), page
         for index, title in enumerate(titles):
             tagged_sent = pos_tag(title.encode('ascii', 'ignore').split())
             # [('Michael', 'NNP'), ('Jackson', 'NNP'), ('likes', 'VBZ'), ('to', 'TO'), ('eat', 'VB'), ('at', 'IN'), ('McDonalds', 'NNP')]
@@ -149,18 +174,21 @@ def runCrawler():
             # print propernouns, title.encode('ascii', 'ignore'), times[index]
             thisone = {
                 "title": title.encode('ascii', 'ignore'),
-                "date": times[index]
+                "date": times[index],
+                "link": baseurl + links[index].get('href')
             }
             alltitles["titles"].append(title)
             alltitles["dates"].append(times[index])
+            titleobject["objects"].append(thisone)
         count = count - 1
 
     # print len(nouns)
 
-    frequencydist = FreqDist(nouns)
-    frequencydist.plot(100, cumulative=True)
-    print alltitles
-    # return frequencydist.most_common(100)
-    return alltitles, frequencydist
 
-runCrawler()
+    frequencydist = FreqDist(nouns)
+    # frequencydist.plot(100, cumulative=True)
+    print titleobject
+    # return frequencydist.most_common(100)
+    return titleobject
+
+# runCrawler()
