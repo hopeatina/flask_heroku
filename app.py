@@ -17,7 +17,7 @@ from neo4jrestclient import client
 from flask.ext.triangle import Triangle
 import re
 from fromdb import from_api
-from CrawlNews import crawlnews
+# from CrawlNews import crawlnews
 # from simulator import simulator
 import operator
 from nltk import pos_tag
@@ -55,7 +55,7 @@ Triangle(app)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
 app.register_blueprint(from_api)
-app.register_blueprint(crawlnews)
+# app.register_blueprint(crawlnews)
 
 ###
 # Routing for your application.
