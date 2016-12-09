@@ -66,7 +66,7 @@ def home():
     test = sc.api_call("api.test")
     channels = sc.api_call("channels.list", token=token)
     # print channels
-    logging.debug(channels)
+    # logging.debug(channels)
     # print sc.api_call(
     #     "chat.postMessage", channel="#general", text="Hello from Python! :tada:",
     #     username='pybot', icon_emoji=':robot_face:'
@@ -106,7 +106,7 @@ def getchannels():
 def getcategories():
     print("Got categories/users")
     users = sc.api_call("users.list",token=token)
-    print(users)
+    # print(users)
     # return jsonify({"list": "channels"})
     return jsonify(users)
 

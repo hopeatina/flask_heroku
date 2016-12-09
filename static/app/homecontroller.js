@@ -38,26 +38,34 @@ function FeedCtrl($scope, $http) {
         {title: "Suggest a Source", content: "Suggest a Source content"}
     ];
     var faketitles = [
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title1", img: "image", link: "newslink"},{name: "title1", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title2", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "titl3e", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title4", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title5", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title6", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title7", img: "image", link: "newslink"} ] },
-        {title: 'fakeTitle', link: "link" , outlets: [{name: "title8", img: "image", link: "newslink"} ] }
+        {
+            title: 'fakeTitle',
+            link: "link",
+            outlets: [{name: "title1", img: "image", link: "newslink"}, {
+                name: "title1",
+                img: "image",
+                link: "newslink"
+            }]
+        },
+        {title: 'fakeTitle', link: "link", outlets: [{name: "title2", img: "image", link: "newslink"}]},
+        {title: 'fakeTitle', link: "link", outlets: [{name: "titl3e", img: "image", link: "newslink"}]},
+        {title: 'fakeTitle', link: "link", outlets: [{name: "title4", img: "image", link: "newslink"}]},
+        {title: 'fakeTitle', link: "link", outlets: [{name: "title5", img: "image", link: "newslink"}]},
+        {title: 'fakeTitle', link: "link", outlets: [{name: "title6", img: "image", link: "newslink"}]},
+        {title: 'fakeTitle', link: "link", outlets: [{name: "title7", img: "image", link: "newslink"}]},
+        {title: 'fakeTitle', link: "link", outlets: [{name: "title8", img: "image", link: "newslink"}]}
     ];
     // $scope.content = $scope.websites[0].content;
     $scope.content = faketitles;
 
-    $scope.switchContent = function(selected) {
+    $scope.switchContent = function (selected) {
         // var data = getRecentCrawl(selected.title);
         $http({
             url: '/thenewsfeed',
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             data: JSON.stringify(selected.title)
-        }).then(function(response) {
+        }).then(function (response) {
             console.log(response);
             $scope.responseobject = response.data.objects;
             $scope.content = $scope.responseobject;
@@ -132,6 +140,7 @@ function MyCtrl($scope, $http, $window) {
     $scope.graphstyle = "background-color:rgba(0, 0, 0, 0.5) !important;";
     $scope.graphstatebool = false;
 
+
     $scope.switchExplore = function () {
         // console.log($scope.connected);
         $scope.connected = true;
@@ -190,7 +199,7 @@ function MyCtrl($scope, $http, $window) {
                 method: 'GET',
                 url: url
             }).then(function successCallback(response) {
-                // $scope.responseobject = response.data;
+                $scope.responseobject = response.data;
                 $scope.currentEntities = [{img: "/static/img/place_holderpic.png", name: "All Users", id: "All"}];
                 // console.log(response);
                 // $scope.channels.push({img: "None", name: "All Channels"});
@@ -200,7 +209,12 @@ function MyCtrl($scope, $http, $window) {
                 getNewMatches($scope.responseobject);
 
                 response.data.members.forEach(function (member) {
-                    $scope.currentEntities.push({img: member.profile.image_32, imglg: member.profile.image_48, name: member.name, id: member.id});
+                    $scope.currentEntities.push({
+                        img: member.profile.image_32,
+                        imglg: member.profile.image_48,
+                        name: member.name,
+                        id: member.id
+                    });
 
                 });
                 // console.log($scope.currentEntities)
@@ -221,6 +235,7 @@ function MyCtrl($scope, $http, $window) {
                 var i;
                 $scope.suggestedMatches = [];
                 for (i = 0; i < 5; i++) {
+
                     var p1 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
                     var p2 = response.data.members[Math.floor(Math.random() * response.data.members.length)];
                     $scope.suggestedMatches.push(
@@ -252,29 +267,33 @@ function MyCtrl($scope, $http, $window) {
         // console.log($scope.catbool);
 
     };
+    $scope.getUsers();
     function getNewMatches(availableUsers) {
-    var i;
-    for (i = 0; i < 5; i++) {
-        var p1 = availableUsers.members[Math.floor(Math.random() * availableUsers.members.length)];
-        var p2 = availableUsers.members[Math.floor(Math.random() * availableUsers.members.length)];
-        $scope.suggestedMatches.push(
-            {
-                "user1": {
-                    "img": p1.profile.image_32,
-                    "imglg": p1.profile.image_48,
-                    "name": p1.name,
-                    "id": p1.id
-                },
-                "user2": {
-                    "img": p2.profile.image_32,
-                    "imglg": p2.profile.image_48,
-                    "name": p2.name,
-                    "id": p2.id
-                }
-            });
+        var i;
+        console.log(availableUsers);
+        $scope.suggestedMatches = [];
+        for (i = 0; i < 5; i++) {
+            var p1 = availableUsers.members[Math.floor(Math.random() * availableUsers.members.length)];
+            var p2 = availableUsers.members[Math.floor(Math.random() * availableUsers.members.length)];
+            $scope.suggestedMatches.push(
+                {
+                    "user1": {
+                        "img": p1.profile.image_32,
+                        "imglg": p1.profile.image_48,
+                        "name": p1.name,
+                        "id": p1.id
+                    },
+                    "user2": {
+                        "img": p2.profile.image_32,
+                        "imglg": p2.profile.image_48,
+                        "name": p2.name,
+                        "id": p2.id
+                    }
+                });
+        }
+
     }
 
-}
     $scope.getGraphData = function (entityid) {
         $scope.graphstatebool = true;
         $scope.userOne.score = 23;
@@ -411,14 +430,13 @@ function MyCtrl($scope, $http, $window) {
         if (!$scope.userOneBool && !$scope.userTwoBool) {
             $scope.selectDisabled = "";
         }
-        getNewMatches($scope.responseobject)
+        // getNewMatches($scope.responseobject)
     };
     $scope.sendMatch = function () {
         $scope.switchConnectInner();
         $scope.introText = "";
     };
     $scope.testAPI();
-    $scope.getUsers();
 
 
 }
